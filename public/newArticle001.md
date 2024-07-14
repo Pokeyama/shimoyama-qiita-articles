@@ -1,12 +1,12 @@
 ---
 title: 【JetBrains】Database Tools and SQLでクエリを実行すると"SET autocommit = 0"が効かないとき
 tags:
-  - 'JetBrains'
-  - 'Rider'
-  - 'PhpStorm'
+  - PhpStorm
+  - JetBrains
+  - Rider
 private: false
-updated_at: ''
-id: null
+updated_at: '2024-07-14T20:35:21+09:00'
+id: ed146c9f46dfd2b4f0fd
 organization_url_name: null
 slide: false
 ignorePublish: false
