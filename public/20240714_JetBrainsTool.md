@@ -5,8 +5,8 @@ tags:
   - JetBrains
   - Rider
 private: false
-updated_at: '2024-07-14T20:35:21+09:00'
-id: ed146c9f46dfd2b4f0fd
+updated_at: '2024-07-14T20:46:01+09:00'
+id: 2ff77834d7cec372498d
 organization_url_name: null
 slide: false
 ignorePublish: false
