@@ -1,3 +1,4 @@
 .remote
 node_modules
 public/qiita.code-workspace
+package-lock.json
