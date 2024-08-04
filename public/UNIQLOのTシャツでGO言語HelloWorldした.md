@@ -1,11 +1,11 @@
 ---
 title: UNIQLOのTシャツのコードを実行しようとしたら意図せずGO言語に入門した
 tags:
-  - 'Go'
-  - HelloWorld 
+  - Go
+  - HelloWorld
 private: false
-updated_at: ''
-id: null
+updated_at: '2024-08-04T21:27:55+09:00'
+id: 62c3f7e5ff78b3156af5
 organization_url_name: null
 slide: false
 ignorePublish: false
