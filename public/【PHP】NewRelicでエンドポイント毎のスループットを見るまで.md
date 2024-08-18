@@ -1,11 +1,11 @@
 ---
 title: 【PHP】NewRelicでエンドポイント毎のパフォーマンスを見るまで
 tags:
-  - 'NewRelic'
-  - 'PHP'
+  - PHP
+  - NewRelic
 private: false
-updated_at: ''
-id: null
+updated_at: '2024-08-18T23:03:19+09:00'
+id: 2c099abea6b271366050
 organization_url_name: null
 slide: false
 ignorePublish: false
