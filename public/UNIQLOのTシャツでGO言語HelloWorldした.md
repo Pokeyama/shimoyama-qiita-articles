@@ -1,17 +1,17 @@
 ---
-title: UNIQLOのTシャツのコードを実行しようとしたら意図せずGO言語に入門した
+title: ユニクロのTシャツのコードを実行しようとしたら意図せずGO言語に入門した
 tags:
   - Go
   - HelloWorld
 private: false
-updated_at: '2024-08-04T21:27:55+09:00'
+updated_at: '2024-08-04T21:37:11+09:00'
 id: 62c3f7e5ff78b3156af5
 organization_url_name: null
 slide: false
 ignorePublish: false
 ---
 # はじめに
-UNIQLOのバラエティゾーンで売ってるプログラムが書かれたTシャツありますよね。
+ユニクロのバラエティゾーンで売ってるプログラムが書かれたTシャツありますよね。
 そもそもGOで書かれているとすら知らなかったのですが、GOについて何も知らない状態から動かしてみました。
 筆者は普段C#とPHPをメインに使用していて、GOは全くの素人です。
 意図せずGOのHelloWorldみたいになったので記事にします。

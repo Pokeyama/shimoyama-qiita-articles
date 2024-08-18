@@ -9,9 +9,6 @@ ARG NEW_RELIC_APP_NAME
 ENV NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
 ENV NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME}
 
-# New Relic PHPエージェントをインストール
-FROM php:fpm
-
 # Install the latest New Relic PHP Agent
 RUN \
     cd /tmp \

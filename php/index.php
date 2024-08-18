@@ -33,12 +33,13 @@ switch ($request) {
         break;
 }
 
-// 各エンドポイントごとのメソッド
+// 各エンドポイント
 function authEndpoint() {
     echo json_encode(["message" => "Auth endpoint"]);
 }
 
 function loginEndpoint() {
+    sleep(1);
     echo json_encode(["message" => "Login endpoint"]);
 }
 
