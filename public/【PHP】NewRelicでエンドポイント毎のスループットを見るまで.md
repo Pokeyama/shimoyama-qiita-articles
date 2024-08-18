@@ -1,10 +1,10 @@
 ---
-title: 【PHP】NewRelicでエンドポイント毎のパフォーマンスを見るまで
+title: 【PHP】APIをNew Relicでエンドポイントごとにモニタリング with Docker
 tags:
   - PHP
   - NewRelic
 private: false
-updated_at: '2024-08-18T23:03:19+09:00'
+updated_at: '2024-08-19T03:04:54+09:00'
 id: 2c099abea6b271366050
 organization_url_name: null
 slide: false
@@ -25,7 +25,7 @@ Mac M2
 
 https://newrelic.com/jp/sign-up-japan
 
-ログインしたらダッシュボードに飛ばされるようになるので、LICENSE_KEYを控えておきます。
+ログインしたらコンソールに飛ばされるので、LICENSE_KEYを控えておきます。
 以下のようにデフォルトでもアカウントが作成されていると思うので、こちらのTypeがINGEST - LICENSEの三点リーダーをクリックしてCopy Keyで取得できます。
 ![スクリーンショット 2024-08-18 21.17.44.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/c509142a-9d0c-9d49-b116-1540084aceec.png)
 
@@ -194,7 +194,7 @@ https://github.com/Pokeyama/shimoyama-qiita-articles/tree/main/php
 
 # NewRelicで見てみる
 
-dockerをビルドします。
+dockerをビルドして.envを読み込ませながら実行します。
 
 ```sh
 $ docker build -t my-php-nginx-app .
@@ -212,8 +212,9 @@ curl http://localhost:8080/result
 {"message":"Auth endpoint"}{"message":"Login endpoint"}{"message":"Info endpoint"}{"message":"Start endpoint"}{"message":"Result endpoint"}
 ```
 
-2分ほど待つと、NewRelic側のAPM&Servicesで先程任意に記述したAppNameが表示されていると思います。
-そこからTransactionページに遷移すると先ほどトランザクションを設定したエンドポイントの詳細が見れます。
+しばらく待つとNewRelicに反映されます。
+コンソールのAPM&Servicesで先程任意に記述したAppNameが表示されています。
+そこからTransactionページに遷移すると先ほどトランザクションを設定したエンドポイントの詳細が見られます。
 
 ![スクリーンショット 2024-08-18 22.20.41.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/2d32806c-c168-8bc3-8bf8-0f2a4119f46c.png)
 
