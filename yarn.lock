@@ -4,7 +4,7 @@
 
 "@qiita/qiita-cli@github:Pokeyama/qiita-cli#dev":
   version "1.5.0"
-  resolved "git+ssh://git@github.com/Pokeyama/qiita-cli.git#e0a759775eef8e0f3a240814f2ad32fbfcf2798d"
+  resolved "git+ssh://git@github.com/Pokeyama/qiita-cli.git#67f20103b07ee2c993fdc91d28690d8339b226dc"
   dependencies:
     arg "^5.0.2"
     boxen "^7.1.1"
