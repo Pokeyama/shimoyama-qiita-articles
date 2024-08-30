@@ -1,10 +1,10 @@
 ---
 title: test_post008
 tags:
-  - 'node'
+  - Node.js
 private: true
-updated_at: ''
-id: null
+updated_at: '2024-08-30T20:54:17+09:00'
+id: fd5ff2e29aa04c45c434
 organization_url_name: null
 slide: false
 ignorePublish: false
