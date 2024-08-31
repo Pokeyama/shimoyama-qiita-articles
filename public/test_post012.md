@@ -2,7 +2,7 @@
 title: test_post012
 tags:
   - 'node'
-private: ture
+private: true
 updated_at: ''
 id: null
 organization_url_name: null
