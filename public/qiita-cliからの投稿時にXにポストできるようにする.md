@@ -1,13 +1,13 @@
 ---
 title: qiita-cliからの投稿時にXに自動でポストできるようにする
 tags:
-  - 'node'
-  - 'QiitaCLI'
-  - 'TypeScript'
-  - 'GitHubActions'
+  - Node.js
+  - TypeScript
+  - GitHubActions
+  - QiitaCLI
 private: false
-updated_at: ''
-id: null
+updated_at: '2024-08-31T22:35:17+09:00'
+id: 2623c18325968ebe2bbd
 organization_url_name: null
 slide: false
 ignorePublish: false
