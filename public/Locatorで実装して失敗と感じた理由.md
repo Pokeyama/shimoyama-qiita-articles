@@ -1,10 +1,10 @@
 ---
 title: 【DI】Service LocatorパターンとDIパターンを理解せず実装して失敗と感じた理由
 tags:
-  - 'DI'
-private : true
-updated_at: ''
-id: null
+  - DI
+private: true
+updated_at: '2024-09-10T01:36:22+09:00'
+id: 35d1031de2276776e569
 organization_url_name: null
 slide: false
 ignorePublish: false
