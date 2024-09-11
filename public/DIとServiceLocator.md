@@ -6,8 +6,8 @@ tags:
   - デザインパターン
   - DependencyInjection
 private: false
-updated_at: ''
-id: null
+updated_at: '2024-09-11T10:59:21+09:00'
+id: f94f738d933a143f470e
 organization_url_name: null
 slide: false
 ignorePublish: false
