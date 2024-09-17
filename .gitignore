@@ -4,3 +4,4 @@ public/qiita.code-workspace
 package-lock.json
 php/.env
 .env
+yarn.lock
