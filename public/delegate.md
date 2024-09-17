@@ -3,6 +3,7 @@ title: 【C#】Expression.Compile()を安易に使ってはいけない理由と
 tags:
   - 'C#'
   - '.NET'
+  - 'パフォーマンス'
 private: false
 updated_at: ''
 id: null
@@ -11,7 +12,7 @@ slide: false
 ignorePublish: false
 ---
 # はじめに
-C#で動的に複雑な処理を実装したい場合、`Delegate`や`Expression`を使用することがあります。
+C#で動的に複雑な処理を実装したい場合、`Func`や`Expression`を使用することがあります。
 特に、式ツリー（Expression Tree）を利用して動的なコードを生成し、実行時にコンパイルして実行する方法は強力ですが、注意が必要です。
 
 例えば、以下のようなコードでループ内で`Expression.Compile()`を呼び出しているときを考えます。
@@ -38,39 +39,50 @@ public void CompileEveryTimeTest()
 ```
 
 ループの度に`x => x * 2`という式を`expression.Compile()`しています。
-これが最悪という話を書いていきます。
+この方法が問題となる理由を解説していきます。
 
-ここからは以下のメソッドを使って処理の全体時間とCPU使用時間を計測していきます。
+ここからは以下のユニットテストクラスを使って処理の全体時間とCPU使用時間を計測していきます。
 ```c#
-// 共通の計測メソッド
-private void MeasurePerformance(string testName, Action testAction)
+public class ExpressionCompilePerformanceTests
 {
-    // プロセス情報の取得
-    var process = Process.GetCurrentProcess();
-    var cpuStartTime = process.TotalProcessorTime;
-    var stopwatch = Stopwatch.StartNew();
+    private readonly ITestOutputHelper _output;
 
-    // テスト処理の実行
-    testAction();
+    public ExpressionCompilePerformanceTests(ITestOutputHelper output)
+    {
+        _output = output;
+    }
 
-    stopwatch.Stop();
-    var cpuEndTime = process.TotalProcessorTime;
+    // 共通の計測メソッド
+    private void MeasurePerformance(string testName, Action testAction)
+    {
+        // プロセス情報の取得
+        var process = Process.GetCurrentProcess();
+        var cpuStartTime = process.TotalProcessorTime;
+        var stopwatch = Stopwatch.StartNew();
 
-    // 計測結果の取得
-    var wallClockTime = stopwatch.ElapsedMilliseconds;
-    var cpuTime = (cpuEndTime - cpuStartTime).TotalMilliseconds;
+        // テスト処理の実行
+        testAction();
 
-    // 結果の出力
-    _output.WriteLine($"[{testName}] 実行時間: {wallClockTime} ms, CPU時間: {cpuTime} ms");
+        stopwatch.Stop();
+        var cpuEndTime = process.TotalProcessorTime;
+
+        // 計測結果の取得
+        var wallClockTime = stopwatch.ElapsedMilliseconds;
+        var cpuTime = (cpuEndTime - cpuStartTime).TotalMilliseconds;
+
+        // 結果の出力
+        _output.WriteLine($"[{testName}] 実行時間: {wallClockTime} ms, CPU時間: {cpuTime} ms");
+    }
+
+    // 以下にテストを並べていきます
+    // [Fact]
 }
 ```
 
 # 問題点
-
-
 ## 遅い、重いの二重苦
 `Expression`は高度な抽象化を提供し、動的に処理を組み立てることができます。
-しかし、式ツリーを実行するためには、一度コンピューターが理解できる形に**コンパイル**して**IL（中間言語）**に変換する必要があります。
+しかし、式ツリーを実行するためには、一度コンピューターが理解できる形に**コンパイル**して **IL（中間言語）** に変換する必要があります。
 
 上記のコードでは、以下の部分で毎回コンパイルが行われます。
 ```c#
@@ -129,8 +141,8 @@ public void CompileOnceTest()
 ```
 
 ```
-[一度だけコンパイル] 実行時間: 0 ms, CPU時間: 0.4572 ms
 [毎回コンパイル] 実行時間: 67 ms, CPU時間: 72.0822 ms
+[一度だけコンパイル] 実行時間: 0 ms, CPU時間: 0.4572 ms
 ```
 
 1秒にも満たないため、小規模なテストでは問題が表面化しません。
@@ -140,13 +152,14 @@ public void CompileOnceTest()
 そもそもNewRelicのようなAPM監視ツールを導入していないと「ここがネック」というのすらわからないといったことも十分に考えられます。
 
 ## VMのコストがかかる
-CPU時間が増大していることから、この処理をさばくためには、サーバーのスペックを向上させるか、サーバーをスケールアウトしなければなりません。
+実際のアプリケーションは何回もこの処理が呼ばれることになります。
+1回辺りのCPU時間が増大していることから、この処理をさばくためには、サーバーのスペックを向上させるか、サーバーをスケールアウトしなければなりません。
 これは直接的にコスト増加につながります。
 
 # 改善策
 ## Expressionを使わずにFuncを直接使用する
 `Expression`を使用する主な理由は、式の構造を解析したり変更したりするためです。
-単純にデリゲートとして実行するだけであれば、`Func`を直接使用する方が効率的です。
+単純にデリゲートとして実行するだけであれば、`Func`を直接使用するだけで事足ります。
 ```c#
 // 直接デリゲートを定義
 private static readonly Func<int, int> DirectFunc = x => x * 2;
@@ -195,6 +208,10 @@ public void CompileOnceTest()
         }
     });
 }
+```
+
+```
+[一度だけコンパイル] 実行時間: 0 ms, CPU時間: 0.4572 ms
 ```
 
 ## キャッシュの実装
@@ -301,6 +318,6 @@ public void StaticCompiledTest()
 どうしても使用しなきゃいけない場面は存在するのですが、その場合も慎重に検討すべきです。
 
 # 参考
+https://docs.microsoft.com/ja-jp/dotnet/csharp/expression-trees
 
-- [Microsoft Docs: Expression Trees（式ツリー）](https://docs.microsoft.com/ja-jp/dotnet/csharp/expression-trees)
-- [パフォーマンス向上で知っておくべきコンピューターサイエンスの基礎知識とその実践](https://zenn.dev/higty/articles/73b6b4a402b94e)
+https://zenn.dev/higty/articles/73b6b4a402b94e
