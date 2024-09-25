@@ -71,7 +71,7 @@ namespace ExpressionCompileTest
         public void FuncTest()
         {
             Func<string, string> greet1 = name => $"こんにちは、{name}さん！";
-            Func<string, string> greet2 = name => FuncSayGoodbye(name);
+            Func<string, string> greet2 = FuncSayGoodbye;
 
             // デリゲートの呼び出し
             _output.WriteLine(greet1("Alice"));
@@ -96,7 +96,7 @@ namespace ExpressionCompileTest
             List<Func<string, string>> funcs = new();
             Func<string, string> greet1 = name => $"こんにちは、{name}さん！";
             funcs.Add(greet1);
-            Func<string, string> greet2 = name => FuncSayGoodbye(name);
+            Func<string, string> greet2 = FuncSayGoodbye;
             funcs.Add(greet2);
 
             foreach (var g in funcs)
