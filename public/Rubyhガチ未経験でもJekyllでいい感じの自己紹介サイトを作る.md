@@ -108,9 +108,10 @@ theme: "minimal-mistakes-jekyll"
 
 ### ビルドして確認
 `_config.yml`を編集した際は後述のホットリロードの設定をしておいてもビルドが必要になります。
+`-l`オプションでホットリロードができるようになるのでつけておきましょう。
 
 ```sh
-$ bundle exec jekyll serve
+$ bundle exec jekyll serve -l
 ```
 
 http://localhost:4000/ にアクセス
@@ -129,11 +130,114 @@ sass:
 
 再ビルドして実行すれば警告が出力されなくなります。
 
-### ホットリロード
-
-
-
 ## ページを作っていく
+### Front Matter
+jekyllは基本的にMarkdownで記述していくのですが、それぞれのページに`Front Matter`という`---`で囲んだyml形式のフィールドがあります。
+ここには変数だったりテーマごとの設定を書くことができます。
+mistakesではいい感じに画像を配置してくれる設定があるので使ってみましょう。
+
+ざっくり以下2点は覚えておいたほうがいいフィールドです。
+1. `layout`
+こちらにあるレイアウトが使えます。
+https://mmistakes.github.io/minimal-mistakes/docs/layouts/
+
+2. `permalink`
+このページへのパスになります。
+このページはトップページなので`/`です。
+
+```yml:index.markdown
+---
+layout: single
+title: "ここがタイトル"
+date: 2024-09-25
+permalink: /
+header:
+  overlay_image: https://user0514.cdnw.net/shared/img/thumb/aig-ai23419012-xl_TP_V.jpg
+  overlay_filter: 0.5
+  overlay_color: "#000"
+  caption: "ここがキャプション"
+  actions:
+    - label: "ここがリンク"
+      url: https://qiita.com/
+      class: "btn--primary"
+excerpt: "ここが概要"
+---
+# ここが記事
+## ここが記事
+### ここが記事
+#### ここが記事
+##### ここが記事
+```
+
+![スクリーンショット 2024-10-03 22.59.43.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/6271b73b-e2d5-459c-857b-ed420af8cc35.png)
+
+一気によく見るホームページのようになりましたね。
+あとはMarkdownでどんどんページを書いていきましょう。
+
+#### Tips.ymlは書かなくてもいい
+`Front Matter`はjekyllに対して、**jekyllで書かれたページだよ**と教えて上げる意味があります。
+なので以下のように何も書かなくてもフィールドさえ作っておけば以下のようにjekyllがページを作ってくれます。
+
+
+```yml
+---
+# 空でもページは作ってくれる。
+---
+```
+
+`layout`を使わずすべて自前で書くときは使うといいかもしれません。
+jekyll使う意味もなくなってしまうかもしれません。
+
+## ページを追加する
+トップページができたのでページを追加していきます。
+ルートディレクトリに適当な名前でmdファイルを作ります。
+
+```sh
+$ touch skill.md
+```
+
+中身にトップページと同じで`Front Matter`を記載してあげます。
+`permalink`は`/skill`とでもしておきましょう。
+
+```yml:skill.md
+---
+layout: single
+title: "スキル"
+permalink: /skill
+---
+# 私のスキル
+## 私のスキル
+### 私のスキル
+#### 私のスキル
+##### 私のスキル
+```
+
+[http://localhost:4000/skill](http://localhost:4000/skill)にアクセスしてみましょう。
+ページができているはずです。
+
+![スクリーンショット 2024-10-03 23.17.37.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/ac2c9bc1-60a2-00e1-0ce7-b7623c29f154.png)
+
+## ヘッダーにページ一覧を表示
+ページは追加できましたが、毎回トップページにリンクを貼るのは面倒です。
+ヘッダーに一覧を出しちゃいましょう。
+ルートディレクトリに`_data/navigation.yml`を作成します。
+
+```sh
+$ mkdir _data
+$ touch navigation.yml
+```
+
+中身にヘッダーに追加したいページタイトルと`permalink`を書きます。
+```yml:navigation.yml
+main:
+  - title: "プロフィール"
+    url: /
+
+  - title: "スキル"
+    url: /skill
+```
+![スクリーンショット 2024-10-03 23.23.01.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/03d7d972-92eb-9275-64ca-d3e8d00a0712.png)
+ヘッダーにリンクが追加されました。
 
 ## _config.yml
 
