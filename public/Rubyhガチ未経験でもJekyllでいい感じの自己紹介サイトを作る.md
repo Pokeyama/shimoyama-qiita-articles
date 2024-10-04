@@ -98,7 +98,7 @@ $ bundle install
 ```
 
 プロジェクト内にある`_config.yml`にもテーマを追記します。
-`これはPagesへのデプロイ時に書き換えます。`
+[これはPagesへのデプロイ時に書き換えます。](#thema)
 
 ```yml
 # 元のテーマはコメントアウトしておく しなくても動きます
@@ -239,10 +239,47 @@ main:
 ![スクリーンショット 2024-10-03 23.23.01.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/03d7d972-92eb-9275-64ca-d3e8d00a0712.png)
 ヘッダーにリンクが追加されました。
 
-## _config.yml
-
-### urlとbaseurl
- 
 ## GitHub Pagesにデプロイ
+ある程度ページができてきたらGitHub Pagesにデプロイしてみましょう。
+GitHubにレポジトリを作ってpushしておきます。（省略）
+レポジトリができたら`Settings -> Pages`とページを降りていき、`Branch`の項目を`master`か`main`にして`Save`します。
+
+![スクリーンショット 2024-10-04 16.30.10.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/4d4cf5e7-107f-37ae-39b4-cedf005ccc80.png)
+
+GitHub側の設定はこれだけになります。
+jekyll用のactionが用意されていて、あとはpushするだけで自動でやってくれます。
+超簡単。
+
+### _config.yml
+最後にjekyllの`_config.yml`にPages用の設定をしていきます。
+
+#### urlとbaseurl
+`baseurl`にはpushしたレポジトリの名前
+`url`にはPagesのドメインを書いておきます。
+
+```yml
+baseurl: "/{レポジトリ名}"
+url: "https://{自分のアカウント名}.github.io" # 
+```
+
+#### thema
+[こちら](#minimal-mistakesテーマのインストール)で設定したテーマをリモートから取得するように書き換えます。
+こうしておかないとGitHubAction内で立ち上がったDocker内からテーマを探しに行ってしまうのでエラーになります。
+
+```yml
+# theme: "minimal-mistakes-jekyll"
+remote_theme: "mmistakes/minimal-mistakes
+```
+
+### デプロイしてみよう！
+ここまでで最低限の設定は終わりです。
+pushするとGitHubActionが動くのでそれが終わったらページを確認してみましょう。
+URLは`https://{ユーザー名}.github.io/{レポジトリ名}/`です。
+お疲れ様でした。
+
+#### 
+
+## _config.ymlのアレコレ
+
 
 ## まとめ
