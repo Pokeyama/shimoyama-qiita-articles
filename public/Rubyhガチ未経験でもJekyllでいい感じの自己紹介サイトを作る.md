@@ -1,5 +1,5 @@
 ---
-title: Rubyガチ未経験でもJekyllでいい感じの転職活動用自己紹介サイトを作る
+title: Ruby未経験でもできる！Jekyllで転職活動用の自己紹介サイトを作成する
 tags:
   - ''
 private: false
@@ -17,7 +17,7 @@ ignorePublish: false
 
 https://pokeyama.github.io/portfolio-jekyll/
 
-この記事の手順でこのサイトとほぼ同等のものが作れます。
+とても長い記事になってしまったのですが、この記事の順を追ってコマンドを実行していけばほぼ同等のものが作れます。
 
 # 環境
 Mac M2
@@ -63,6 +63,7 @@ $ cd qiita-jekyll
 
 ### Hello World（飛ばしてもいい）
 とりあえずこの時点でHello Worldしたい方は以下のコマンドでインストール&ビルド&実行をします。
+`bundle install `は、Gemfileに記載された依存関係をインストールします。
 
 ```sh
 $ bundle install
@@ -98,7 +99,7 @@ $ bundle install
 ```
 
 プロジェクト内にある`_config.yml`にもテーマを追記します。
-[これはPagesへのデプロイ時に書き換えます。](#thema)
+[これはPagesへのデプロイ時に書き換えます。](#_configyml)
 
 ```yml
 # 元のテーマはコメントアウトしておく しなくても動きます
@@ -107,11 +108,12 @@ theme: "minimal-mistakes-jekyll"
 ```
 
 ### ビルドして確認
-`_config.yml`を編集した際は後述のホットリロードの設定をしておいてもビルドが必要になります。
 `-l`オプションでホットリロードができるようになるのでつけておきましょう。
+`_config.yml`を編集した際は後述のホットリロードの設定をしておいてもビルドが必要になります。
+`--baseurl-""`がついている理由は[こちら](#urlとbaseurl)
 
 ```sh
-$ bundle exec jekyll serve -l
+$ bundle exec jekyll serve --baseurl="" -l
 ```
 
 http://localhost:4000/ にアクセス
@@ -120,7 +122,7 @@ http://localhost:4000/ にアクセス
 ![スクリーンショット 2024-10-02 23.11.30.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/5441e974-dacd-b244-cc63-f313fcecb5d9.png)
 
 ### Sassの警告がうるさいとき
-jekyllのこのバージョンのせいだと思うんですが、Sassの非推奨関数を使っているという警告が無限に出ると思います。
+jekyllのバージョンのせいだと思うんですが、Sassの非推奨関数を使っているという警告が無限に出ると思います。
 ログに流したくないときは`_config.yml`に以下を記述します。
 
 ```yml
@@ -139,10 +141,11 @@ mistakesではいい感じに画像を配置してくれる設定があるので
 ざっくり以下2点は覚えておいたほうがいいフィールドです。
 1. `layout`
 こちらにあるレイアウトが使えます。
+
 https://mmistakes.github.io/minimal-mistakes/docs/layouts/
 
 2. `permalink`
-このページへのパスになります。
+ページへのパスになります。
 このページはトップページなので`/`です。
 
 ```yml:index.markdown
@@ -174,8 +177,8 @@ excerpt: "ここが概要"
 一気によく見るホームページのようになりましたね。
 あとはMarkdownでどんどんページを書いていきましょう。
 
-#### Tips.ymlは書かなくてもいい
-`Front Matter`はjekyllに対して、**jekyllで書かれたページだよ**と教えて上げる意味があります。
+#### Tips.ymlの中身は空でもいい
+`Front Matter`はjekyllに対して、**jekyllで書かれたページだよ**と教えて上げる意味もあります。
 なので以下のように何も書かなくてもフィールドさえ作っておけば以下のようにjekyllがページを作ってくれます。
 
 
@@ -239,10 +242,69 @@ main:
 ![スクリーンショット 2024-10-03 23.23.01.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/03d7d972-92eb-9275-64ca-d3e8d00a0712.png)
 ヘッダーにリンクが追加されました。
 
-## GitHub Pagesにデプロイ
+## サイドバーにプロフィールを表示
+`_config.yml`にauthorフィールドを追加し、サイドバーにプロフィールを表示します。
+
+```yml:_config.yml
+author:
+  name: "しもやま"
+  bio: "Qiita記事執筆中"
+  location: "東京都"
+  email: "qiita@example.com"
+  linkedin: "https://www.linkedin.com/in/qiita"
+  github: "https://github.com/qiita"
+```
+
+プロフィールを追加したいページの`Front Matter`に`author_profile`を追加します。
+
+```yml:index.markdown
+---
+layout: home
+title: "ここがタイトル"
+date: 2024-09-25
+permalink: /
+header:
+  overlay_image: https://user0514.cdnw.net/shared/img/thumb/aig-ai23419012-xl_TP_V.jpg
+  overlay_filter: 0.5
+  overlay_color: "#000"
+  caption: "ここがキャプション"
+  actions:
+    - label: "ここがリンク"
+      url: https://qiita.com/
+      class: "btn--primary"
+excerpt: "ここが概要"
+author_profile: true # これを追加
+---
+```
+
+![スクリーンショット 2024-10-05 22.31.01.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/ffe62e67-7f63-4cb1-ae60-142d91c494da.png)
+
+### カスタムアイコンを使う
+GitHubなどの海外でも主要なサービスはテーマ側で予めフィールドが用意されているのですが、そうではないサービスをリンクに追加したいときがあると思います。
+以下のアイコンサイトの画像がアセットに入っており使用することができます。
+
+https://fontawesome.com/v5/search
+
+注意点があり、こちらのサイトのバージョンが6系のアイコンは使えませんでした。
+探すときはバージョンを5系にしましょう。
+
+```yml
+author:
+  name: "しもやま"
+  bio: "Qiita記事執筆中"
+  location: "東京都"
+  links:
+  - label: " Qiita"
+    icon: "fas fa-pen" # 代替アイコンとしてペンを使用
+    url: "https://qiita.com/simoyama2323"
+```
+
+
+# GitHub Pages
+##  デプロイ
 ある程度ページができてきたらGitHub Pagesにデプロイしてみましょう。
 GitHubにレポジトリを作ってpushしておきます。（省略）
-レポジトリができたら`Settings -> Pages`とページを降りていき、`Branch`の項目を`master`か`main`にして`Save`します。
+レポジトリができたら、GitHubの設定ページから`Settings` -> `Pages`に移動し、`Branch`の項目を`master`または`main`に設定して`Save`をクリックします。
 
 ![スクリーンショット 2024-10-04 16.30.10.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/4d4cf5e7-107f-37ae-39b4-cedf005ccc80.png)
 
@@ -250,36 +312,69 @@ GitHub側の設定はこれだけになります。
 jekyll用のactionが用意されていて、あとはpushするだけで自動でやってくれます。
 超簡単。
 
-### _config.yml
+## _config.yml
 最後にjekyllの`_config.yml`にPages用の設定をしていきます。
 
-#### urlとbaseurl
-`baseurl`にはpushしたレポジトリの名前
-`url`にはPagesのドメインを書いておきます。
+### urlとbaseurl
+GitHub Pagesにデプロイする際、`url`と`baseurl`を正しく設定する必要があります。
+`url`は公開するページの基本URLで、`baseurl`はそのURLのサブディレクトリに当たります。
 
-```yml
+```yml:_config.yml
 baseurl: "/{レポジトリ名}"
-url: "https://{自分のアカウント名}.github.io" # 
+url: "https://{自分のアカウント名}.github.io"
 ```
 
-#### thema
+`baseurl`を設定するとローカルでのビルドでもパスについてきてしまうので検証に問題が出ます。
+以下のコマンドで実行するようにすると`baseurl`が空で実行できるのでこちらで実行するようにします。
+
+```sh
+$ bundle exec jekyll serve --baseurl="" -l
+```
+
+### theme
 [こちら](#minimal-mistakesテーマのインストール)で設定したテーマをリモートから取得するように書き換えます。
 こうしておかないとGitHubAction内で立ち上がったDocker内からテーマを探しに行ってしまうのでエラーになります。
 
-```yml
+```yml:_config.yml
 # theme: "minimal-mistakes-jekyll"
-remote_theme: "mmistakes/minimal-mistakes
+remote_theme: "mmistakes/minimal-mistakes"
 ```
 
-### デプロイしてみよう！
+### plugins
+リモートテーマを使用するためにプラグインを追加しておきます。
+
+```yml:_config.yml
+plugins:
+  - jekyll-feed
+  - jekyll-remote-theme
+  - jekyll-include-cache
+```
+
+### Gemfile
+リモートテーマプラグインを使用するためにGemFileにモジュールをインストールしておきます。
+
+```ruby:Gemfile
+gem "jekyll-remote-theme"
+```
+
+### ページを確認してみよう！
 ここまでで最低限の設定は終わりです。
-pushするとGitHubActionが動くのでそれが終わったらページを確認してみましょう。
+pushするとGitHub Actionが動くのでそれが終わったらページを確認してみましょう。
 URLは`https://{ユーザー名}.github.io/{レポジトリ名}/`です。
 お疲れ様でした。
 
-#### 
-
 ## _config.ymlのアレコレ
+最低限Pagesで動かすようの設定をしましたが色々な記述ができます。
+以下にこのテーマで使えるプロパティの一覧があるので色々試してみるとおもしろいと思います。
 
+https://github.com/mmistakes/minimal-mistakes/blob/master/_config.yml
 
-## まとめ
+# まとめ
+この記事では、Jekyllを使って転職活動用の自己紹介サイトを作成する手順を紹介しました。
+Markdownで書けるって素晴らしい。
+
+# 使用させて頂いた素材
+
+https://www.pakutaso.com/20230556126post-46690.html
+
+https://icons8.jp/icons/set/docker-image
