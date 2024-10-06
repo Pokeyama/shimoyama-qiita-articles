@@ -32,8 +32,8 @@ ruby 3.3.5 (2024-09-03 revision ef084cc8f4) [arm64-darwin23]
 2. **Markdownで書ける**
 3. GitHub Pagesに割と簡単にデプロイできる。
 
-主に2の理由でJekyllにしました。
-デザインセンス皆無なんでMarkdownで書きたかったっていうのが一番大きい理由です。
+Jekyllは、ブログやポートフォリオ、技術ドキュメント、個人ウェブサイトなど、簡単なウェブサイトを素早く構築できるのが特徴です。
+サーバーサイドの処理が必要ない静的サイトジェネレーターなので、ホスティングコストが低く、特にGitHub Pagesを使えば無料で公開できます。
 
 # 作っていく
 ## RubyとJekyllのインストール
@@ -63,7 +63,7 @@ $ cd qiita-jekyll
 
 ### Hello World（飛ばしてもいい）
 とりあえずこの時点でHello Worldしたい方は以下のコマンドでインストール&ビルド&実行をします。
-`bundle install `は、Gemfileに記載された依存関係をインストールします。
+`bundle install `は、GemFileに記載された依存関係をインストールします。
 
 ```sh
 $ bundle install
@@ -82,7 +82,7 @@ https://mmistakes.github.io/minimal-mistakes/
 画像をいい感じに貼れたり、全体的な色もざっくり変えられるテーマです。
 なんだかこんな感じのページよく見るなあと思って採用しました。
 
-プロジェクトの中のGemfileに以下を記述します。
+プロジェクトの中のGemFileに以下を記述します。
 
 ```ruby
 source "https://rubygems.org"
@@ -279,8 +279,8 @@ author_profile: true # これを追加
 
 ![スクリーンショット 2024-10-05 22.31.01.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/ffe62e67-7f63-4cb1-ae60-142d91c494da.png)
 
-### カスタムアイコンを使う
-GitHubなどの海外でも主要なサービスはテーマ側で予めフィールドが用意されているのですが、そうではないサービスをリンクに追加したいときがあると思います。
+### カスタムリンク
+カスタムのリンクやSNSを追加したい場合は、`links`フィールドに新しいエントリを追加して表示させることができます。
 以下のアイコンサイトの画像がアセットに入っており使用することができます。
 
 https://fontawesome.com/v5/search
@@ -300,8 +300,8 @@ author:
 ```
 
 
-# GitHub Pages
-##  デプロイ
+# GitHub Pagesにデプロイ
+## GitHub側
 ある程度ページができてきたらGitHub Pagesにデプロイしてみましょう。
 GitHubにレポジトリを作ってpushしておきます。（省略）
 レポジトリができたら、GitHubの設定ページから`Settings` -> `Pages`に移動し、`Branch`の項目を`master`または`main`に設定して`Save`をクリックします。
@@ -312,10 +312,11 @@ GitHub側の設定はこれだけになります。
 jekyll用のactionが用意されていて、あとはpushするだけで自動でやってくれます。
 超簡単。
 
-## _config.yml
+## ローカル側
+### _config.yml
 最後にjekyllの`_config.yml`にPages用の設定をしていきます。
 
-### urlとbaseurl
+#### urlとbaseurl
 GitHub Pagesにデプロイする際、`url`と`baseurl`を正しく設定する必要があります。
 `url`は公開するページの基本URLで、`baseurl`はそのURLのサブディレクトリに当たります。
 
@@ -324,14 +325,15 @@ baseurl: "/{レポジトリ名}"
 url: "https://{自分のアカウント名}.github.io"
 ```
 
-`baseurl`を設定するとローカルでのビルドでもパスについてきてしまうので検証に問題が出ます。
-以下のコマンドで実行するようにすると`baseurl`が空で実行できるのでこちらで実行するようにします。
+`baseurl`を設定すると、ローカル環境でのビルドでもURLのパスに`/リポジトリ名`が付いてしまいます。
+これにより、リンクが正しく機能しない場合があるため、ローカル開発時には`--baseurl=""`オプションを使ってこの挙動を無効にします。
+こうすることで、ローカル環境ではトップディレクトリからアクセスできます。
 
 ```sh
 $ bundle exec jekyll serve --baseurl="" -l
 ```
 
-### theme
+#### theme
 [こちら](#minimal-mistakesテーマのインストール)で設定したテーマをリモートから取得するように書き換えます。
 こうしておかないとGitHubAction内で立ち上がったDocker内からテーマを探しに行ってしまうのでエラーになります。
 
@@ -340,7 +342,7 @@ $ bundle exec jekyll serve --baseurl="" -l
 remote_theme: "mmistakes/minimal-mistakes"
 ```
 
-### plugins
+#### plugins
 リモートテーマを使用するためにプラグインを追加しておきます。
 
 ```yml:_config.yml
@@ -350,14 +352,14 @@ plugins:
   - jekyll-include-cache
 ```
 
-### Gemfile
+### GemFile
 リモートテーマプラグインを使用するためにGemFileにモジュールをインストールしておきます。
 
-```ruby:Gemfile
+```ruby:GemFile
 gem "jekyll-remote-theme"
 ```
 
-### ページを確認してみよう！
+## ページを確認してみよう！
 ここまでで最低限の設定は終わりです。
 pushするとGitHub Actionが動くのでそれが終わったらページを確認してみましょう。
 URLは`https://{ユーザー名}.github.io/{レポジトリ名}/`です。
@@ -371,7 +373,13 @@ https://github.com/mmistakes/minimal-mistakes/blob/master/_config.yml
 
 # まとめ
 この記事では、Jekyllを使って転職活動用の自己紹介サイトを作成する手順を紹介しました。
+最初は自分で借りてるVPSで公開しようと思ってたんですが、Pagesでの公開が簡単すぎたので使ってみました。
 Markdownで書けるって素晴らしい。
+
+# 最後に
+この記事が役に立った、または私の技術に興味を持っていただけた企業様がいらっしゃいましたら、ぜひ以下の自己紹介サイトよりお気軽にご連絡ください！  
+
+https://pokeyama.github.io/portfolio-jekyll/
 
 # 使用させて頂いた素材
 
