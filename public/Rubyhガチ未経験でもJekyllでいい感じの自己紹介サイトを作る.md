@@ -66,7 +66,7 @@ $ cd qiita-jekyll
 
 ### Hello World（飛ばしてもいい）
 とりあえずこの時点でHello Worldしたい方は以下のコマンドでインストール&ビルド&実行をします。
-`bundle install `は、GemFileに記載された依存関係をインストールします。
+`bundle install`は、GemFileに記載された依存関係をインストールします。
 
 ```sh
 $ bundle install
@@ -102,7 +102,7 @@ $ bundle install
 ```
 
 プロジェクト内にある`_config.yml`にもテーマを追記します。
-[これはPagesへのデプロイ時に書き換えます。](#_configyml)
+[これはPagesへのデプロイ時に書き換えます。](#theme)
 
 ```yml
 # 元のテーマはコメントアウトしておく しなくても動きます
