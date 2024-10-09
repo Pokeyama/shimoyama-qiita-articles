@@ -1,13 +1,13 @@
 ---
 title: Ruby未経験でもできる！Jekyllで転職活動用の自己紹介サイトを作成する
 tags:
-  - 'Jekyll'
-  - 'Ruby'
-  - '転職'
-  - 'ポートフォリオ'
+  - Ruby
+  - Jekyll
+  - 転職
+  - ポートフォリオ
 private: false
-updated_at: ''
-id: null
+updated_at: '2024-10-09T11:56:53+09:00'
+id: 19e2ede05b76af50924e
 organization_url_name: null
 slide: false
 ignorePublish: false
