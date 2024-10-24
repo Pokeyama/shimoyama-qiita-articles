@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjectionPattern"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DILifeCycle", "DILifeCycle\DILifeCycle.csproj", "{371A0B3B-EFDF-42FA-82F8-4042AA59D0A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjectionPattern.Tests", "DependencyInjectionPattern.Tests\DependencyInjectionPattern.Tests.csproj", "{DBB3DA51-E8CD-4626-8CA4-6F7B7FBAB693}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceLocatorPattern.Tests", "ServiceLocatorPattern.Tests\ServiceLocatorPattern.Tests.csproj", "{321411C3-F78B-4943-8DF3-EBE62616C237}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +45,14 @@ Global
 		{371A0B3B-EFDF-42FA-82F8-4042AA59D0A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{371A0B3B-EFDF-42FA-82F8-4042AA59D0A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{371A0B3B-EFDF-42FA-82F8-4042AA59D0A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBB3DA51-E8CD-4626-8CA4-6F7B7FBAB693}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBB3DA51-E8CD-4626-8CA4-6F7B7FBAB693}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBB3DA51-E8CD-4626-8CA4-6F7B7FBAB693}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBB3DA51-E8CD-4626-8CA4-6F7B7FBAB693}.Release|Any CPU.Build.0 = Release|Any CPU
+		{321411C3-F78B-4943-8DF3-EBE62616C237}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{321411C3-F78B-4943-8DF3-EBE62616C237}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{321411C3-F78B-4943-8DF3-EBE62616C237}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{321411C3-F78B-4943-8DF3-EBE62616C237}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

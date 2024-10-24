@@ -5,34 +5,48 @@ namespace ServiceLocatorPattern
     // サービスインターフェース
     public interface IService
     {
-        void Serve();
+        string Serve();
     }
 
     // サービス実装
     public class ServiceA : IService
     {
-        public void Serve()
+        public virtual string Serve()
         {
-            Console.WriteLine("ServiceA is serving.");
+            return "Call to non Mock.";
         }
     }
 
     // サービスロケーター
-    public static class ServiceLocator
+    public class ServiceLocator
     {
+        // staticということは他のスレッドに影響しうる
+        // テストのたびに実行しなおさなければならないので単純に時間がかかる
         private static IService? _service;
 
-        // サービスを登録
-        public static void RegisterService(IService service)
+        // サービスを取得
+        public virtual TService GetService<TService>() where TService : IService, new()
         {
-            _service = service;
+            if (_service == null) _service = new TService();
+            return (TService)_service;
+        }
+    }
+
+    public class UseCase
+    {
+        ServiceLocator container;
+
+        public void Initialize(ServiceLocator serviceLocator)
+        {
+            container = serviceLocator;
         }
 
-        // サービスを取得
-        public static IService GetService()
+        public string Invoke()
         {
-            if (_service == null) throw new InvalidOperationException("Service not registered");
-            return _service;
+            // このクラスで必須なServiceがこれだと不明
+            // この書き方だと必ずしも必要とはいえない
+            var serviceA = container.GetService<ServiceA>();  
+            return serviceA.Serve();  
         }
     }
 
@@ -40,12 +54,12 @@ namespace ServiceLocatorPattern
     {
         static void Main(string[] args)
         {
-            // サービスロケーターにサービスを登録
-            ServiceLocator.RegisterService(new ServiceA());
+            var container = new ServiceLocator();
 
             // サービスを取得して使用
-            var service = ServiceLocator.GetService();
-            service.Serve();
+            var service = container.GetService<ServiceA>();
+            var result = service.Serve();
+            Console.WriteLine(result);
         }
     }
 }
