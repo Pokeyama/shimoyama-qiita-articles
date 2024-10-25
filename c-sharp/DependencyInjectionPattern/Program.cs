@@ -18,6 +18,19 @@ namespace DependencyInjectionPattern
         }
     }
 
+    public class DateTimeProvider
+    {
+        private DateTime AccessDate {get;set;}
+
+        public DateTimeProvider(DateTime dateTime){
+            AccessDate = dateTime;
+        }
+
+        public DateTime GetAccessDate(){
+            return AccessDate;
+        }
+    } 
+
     // クライアントクラス (依存性注入を使用)
     // public class Client
     // {
@@ -39,13 +52,23 @@ namespace DependencyInjectionPattern
     {
         private readonly IService _serviceA;
 
-        public UseCase(IService service)
+        private readonly DateTimeProvider _dateTimeProvider;
+
+        public UseCase(IService service, DateTimeProvider dateTimeProvider)
         {
             _serviceA = service;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public string Invoke()
         {
+            DateTime receiptExpireDate = DateTime.1hourAgo;
+            // receiptExpireDateが小さかったらエラー
+            if(receiptExpireDate < _dateTimeProvider.GetAccessDate())
+            {
+                throw new Exception();
+            }
+
             return _serviceA.Serve();
         }
     }
@@ -54,23 +77,24 @@ namespace DependencyInjectionPattern
     {
         static void Main(string[] args)
         {
-            var serviceA = new ServiceA();
-            var useCase = new UseCase(serviceA);
-            var result = useCase.Invoke();
+            // var serviceA = new ServiceA();
+            // var useCase = new UseCase(serviceA);
+            // var result = useCase.Invoke();
 
-            Console.WriteLine(result);
+            // Console.WriteLine(result);
             // DIコンテナで書く場合
-            // // DIコンテナのセットアップ
-            // var serviceCollection = new ServiceCollection();
-            // serviceCollection.AddTransient<IService, ServiceA>(); // サービスの登録
-            // serviceCollection.AddTransient<UseCase>(); // クライアントの登録
+            // DIコンテナのセットアップ
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddTransient<IService, ServiceA>(); // サービスの登録
+            serviceCollection.AddTransient<DateTimeProvider>(); // サービスの登録
+            serviceCollection.AddTransient<UseCase>(); // クライアントの登録
 
-            // // サービスプロバイダーを作成
-            // var serviceProvider = serviceCollection.BuildServiceProvider();
+            // サービスプロバイダーを作成
+            var serviceProvider = serviceCollection.BuildServiceProvider();
 
-            // // DIでクライアントを解決して使用
-            // var client = serviceProvider.GetRequiredService<UseCase>();
-            // client.Invoke();
+            // DIでクライアントを解決して使用
+            var client = serviceProvider.GetRequiredService<UseCase>();
+            client.Invoke();
         }
     }
 }

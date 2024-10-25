@@ -36,9 +36,20 @@ namespace ServiceLocatorPattern
     {
         ServiceLocator container;
 
+        private DateTime AccessDate{get;set;} = new DateTime();
+
         public void Initialize(ServiceLocator serviceLocator)
         {
             container = serviceLocator;
+        }
+
+        public DateTime GetAccessDate()
+        {
+            return AccessDate;
+        }
+
+        public void SetAccessDate(DateTime dateTime){
+            this.AccessDate = dateTime;
         }
 
         public string Invoke()
@@ -46,6 +57,14 @@ namespace ServiceLocatorPattern
             // このクラスで必須なServiceがこれだと不明
             // この書き方だと必ずしも必要とはいえない
             var serviceA = container.GetService<ServiceA>();  
+
+            // DateTime receiptExpireDate = DateTime.1hourAgo;
+            // receiptExpireDateが小さかったらエラー
+            // if(receiptExpireDate < AccessDate)
+            // {
+            //     throw new Exception();
+            // }
+
             return serviceA.Serve();  
         }
     }

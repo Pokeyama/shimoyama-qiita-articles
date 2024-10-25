@@ -19,7 +19,9 @@ public class UnitTest1
         // Arrange
         var mockService = Substitute.For<IService>();  // モックサービスの作成
         mockService.Serve().Returns("Call to Mock.");
-        var client = new UseCase(mockService);          // モックを注入してクライアントを作成
+        var dateTimeProvider = Substitute.For<DateTimeProvider>();
+        dateTimeProvider.GetAccessDate().Returns(new DateTime());
+        var client = new UseCase(mockService, dateTimeProvider);          // モックを注入してクライアントを作成
 
         // Act
         var result = client.Invoke();  // クライアントがサービスを使用
