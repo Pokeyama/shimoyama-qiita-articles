@@ -18,9 +18,9 @@ Laravel 11
 PHP 8.3
 
 # 実装
-いろいろ試したんですが、最初に実装方法を。
+いろいろ試行錯誤した結果、最終的な実装方法は以下のとおりです。
 ## エラーをまとめたクラス
-以下のようにエラーをあらかじめ定義しておきます。
+あらかじめエラー内容を定義しておき、再利用性と保守性を高めます。
 これをいい感じに使えるようにしていきます。
 ```php
 class CustomErrors
@@ -40,7 +40,7 @@ class CustomErrors
 ```
 
 ## 例外
-`Exception`を拡張して先ほど定義したエラークラスを扱いやすくしておきます。
+Laravel の標準 `Exception` を拡張し、先ほど定義したエラー定数を扱いやすくします。
 ```php
 class CustomException extends Exception
 {
@@ -73,8 +73,9 @@ class CustomException extends Exception
 
 ```
 
-## Hndler
-ミドルウェアに挿入するようのハンドラーを作ります。
+## ハンドラ
+例外発生時のレスポンスをJSONで返すためのハンドラークラスを作成します。
+Laravel 11では、例外はグローバルに管理される `withExceptions()`経由で処理されるため、ミドルウェア内での `try-catch` ではなく、こちらで一元管理します。
 ```php
 class ExceptionHandler
 {
@@ -106,7 +107,6 @@ class ExceptionHandler
         });
     }
 }
-
 ```
 
 ## 汎用例外ハンドラーに登録
@@ -119,7 +119,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // ここに追加
@@ -165,7 +164,35 @@ Route::get('/test', function (Request $request) {
 
 # ハマったポイント
 ## ミドルウェアでcatchできない
+当初は、ミドルウェア内の `try-catch` で例外を捕捉しようとしましたが、以下のように記述してもうまく `catch`ブロックに入りませんでした。
+```php
+class ExceptionHandler
+{
+    public function handle(Request $request, Closure $next): Response
+    {
+        try {
+            return $next($request);
+        } catch (\Throwable $th) {
+            // ここに入ってほしい
+            if ($th instanceof ApiException) {
+                return response();
+            }
+
+            return response();
+        }
+    }
+}
+```
+
+例外は`bootstrap/app.php`の`withExceptions`に渡されてしまうそうです。
+ドキュメント内だと「一元管理できるようなった」と表現されています。
+https://readouble.com/laravel/11.x/ja/errors.html
 
 ## Laravel 10.x以下との違い
+Laravel 10.x 以下では、例外は主に `app/Exceptions/Handler.php` やミドルウェア内の try-catch で処理されていたようです。
+互換性がなさそうなのでドキュメントを読む際は気をつけたいですね。
+https://readouble.com/laravel/10.x/ja/errors.html
 
-
+# まとめ
+今回、Laravel 11 でのカスタムクラスを使用したエラーハンドリングの実装例を紹介しました。
+最初からブラウザで見やすいエラー画面が用意されていたり至れり尽くせりだなあと思ってたんですが、その分勉強しないといけないことが多そうです。
