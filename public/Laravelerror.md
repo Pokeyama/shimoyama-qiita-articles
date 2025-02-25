@@ -1,7 +1,8 @@
 ---
 title: 【Laravel】11.x カスタムクラスを使用したエラーハンドリング
 tags:
-  - ''
+  - 'Laravel'
+  - 'PHP'
 private: false
 updated_at: ''
 id: null
