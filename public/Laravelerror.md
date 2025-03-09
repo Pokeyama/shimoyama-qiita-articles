@@ -175,7 +175,7 @@ class ExceptionHandler
             return $next($request);
         } catch (\Throwable $th) {
             // ここに入ってほしい
-            if ($th instanceof ApiException) {
+            if ($th instanceof CustomException) {
                 return response();
             }
 
