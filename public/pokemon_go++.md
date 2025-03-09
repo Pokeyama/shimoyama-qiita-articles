@@ -1,11 +1,11 @@
 ---
 title: Pokémon GO Plus+ の振動を無効化する
 tags:
-  - 'DIY'
-  - 'ポケモン'
+  - DIY
+  - ポケモン
 private: false
-updated_at: ''
-id: null
+updated_at: '2025-03-09T17:38:47+09:00'
+id: 40db882cfbc46963dca1
 organization_url_name: null
 slide: false
 ignorePublish: false
