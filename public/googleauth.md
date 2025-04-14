@@ -1,5 +1,5 @@
 ---
-title: GoogleのOAuth認証でアクセストークンを取得する
+title: OAuth2.0認証でGoogleAPIのアクセストークンを取得する
 tags:
   - 'googleapi'
   - 'Node.js'
