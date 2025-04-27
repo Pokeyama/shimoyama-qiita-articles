@@ -1,10 +1,10 @@
 ---
 title: 【C#】複雑なロジックを持つ処理では、参照渡しは副作用を理解した上で使用する【ref/out】
 tags:
-  - 'C#'
+  - C#
 private: true
-updated_at: ''
-id: null
+updated_at: '2025-04-27T20:21:47+09:00'
+id: ad16f05d6d86cc36e41e
 organization_url_name: null
 slide: false
 ignorePublish: false
