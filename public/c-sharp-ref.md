@@ -179,6 +179,54 @@ void ParallelMutate(ref Packet packet)
 # 代替手段
 そもそも代替という考え方自体が悪いような気がしますが、こういう考え方もあるよといった感じで。
 
+## in引数を使用する
+
+`in` 修飾子を使うと、**読み取り専用の参照渡し**が可能になります。
+大きな構造体（`struct`）をコピーせずに渡しつつ、メソッド内での不意の変更をコンパイル時に防げるため、副作用のリスクを下げつつパフォーマンスも確保できます。
+
+```csharp
+// 大きなデータを持つ struct の例
+public struct BigData
+{
+    public readonly int[] Values;
+    public BigData(int[] values) => Values = values;
+
+    // 読み取り専用のプロパティやメソッドを定義しておく
+    public int Sum() => Values.Sum();
+}
+
+// 読み取り専用の参照渡し
+void ProcessData(in BigData data)
+{
+    // OK: メソッド内での読み取り
+    Console.WriteLine($"合計: {data.Sum()}");
+
+    // NG: in 引数は読み取り専用のためコンパイルエラー
+    // data.Values = new int[] { 1, 2, 3 };
+    // data = new BigData(new int[] { });
+}
+```
+
+### in句の注意点
+オブジェクトのフィールドの書き換えは許容されるので注意が必要です。（非イミュータブル）
+```c#
+class User{ public int id; }
+
+private void SetId(in User user)
+{
+    user.id = 999;
+}
+
+[Fact]
+public void InTest()
+{
+    var user = new User{ id = 1 };
+    SetId(in user);
+    _output.WriteLine(user.id.ToString()); // 999
+}
+```
+
+
 ## DTO にまとめて返す
 複数の戻り値をまとめたい場合は、専用のDTOクラスや構造体を定義して返します。
 ```c#

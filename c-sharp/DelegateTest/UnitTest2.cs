@@ -211,6 +211,23 @@ namespace ExpressionCompileTest
             }
         }
 
+#region To:M平
+        class User{ public int id; }
+
+        private void SetId(in User user)
+        {
+            user.id = 999;
+        }
+
+        [Fact]
+        public void InTest()
+        {
+            var user = new User{ id = 1 };
+            SetId(in user);
+            _output.WriteLine(user.id.ToString()); // 999
+        }
+#endregion
+
         static Func<int, int, int> BuildExpression(string operation)
         {
             // パラメーターの定義 (a, b)
