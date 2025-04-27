@@ -226,6 +226,24 @@ public void InTest()
 }
 ```
 
+フィールドの書き換えまで防ぎたい場合はプロパティに`init`をつけてあげましょう。
+
+```c#
+class User{ public int id{ get; init; } }
+
+private void SetId(in User user)
+{
+    user.id = 999; // ここでコンパイルエラーになる
+}
+
+[Fact]
+public void InTest()
+{
+    var user = new User{ id = 1 };
+    SetId(in user);
+    _output.WriteLine(user.id.ToString());
+}
+```
 
 ## DTO にまとめて返す
 複数の戻り値をまとめたい場合は、専用のDTOクラスや構造体を定義して返します。

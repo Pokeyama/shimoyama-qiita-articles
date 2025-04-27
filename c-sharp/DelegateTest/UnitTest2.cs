@@ -212,7 +212,7 @@ namespace ExpressionCompileTest
         }
 
 #region To:M平
-        class User{ public int id; }
+        class User{ public int id{ get; init;} }
 
         private void SetId(in User user)
         {
