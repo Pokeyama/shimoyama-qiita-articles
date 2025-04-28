@@ -1,10 +1,11 @@
 ---
 title: 【C#】参照渡しは副作用を理解した上で使用する【ref/out/修飾子なし】
 tags:
-  - C#
-private: true
-updated_at: '2025-04-27T21:38:47+09:00'
-id: ad16f05d6d86cc36e41e
+  - 'C#'
+  - '参照渡し'
+private: false
+updated_at: ''
+id: null
 organization_url_name: null
 slide: false
 ignorePublish: false
@@ -12,6 +13,7 @@ ignorePublish: false
 # はじめに
 参照渡し自体は何も悪くなく、**副作用を理解して使っているか**という観点の記事になります。
 現に`Try〇〇`は`out`使われていますし。(慣習的なやつだと思ってます)
+題名にC#とつけていますが、副作用に対する考え方は他言語でも同じです。
 
 本記事の`副作用`とは「関数の引数に対する破壊的変更」のことを指しています。
 
@@ -303,3 +305,4 @@ Console.WriteLine($"Success: {result.IsSuccess}, X: {result.Transformed.X}");
 # まとめ
 過去に何も理解せず参照渡しばかりのコードを書いてしまって地獄を見たので、地獄を言語化してみました。
 難しいことを考えたくない場合、チームのコーディング規約として「引数は書き換えない」ルールを定めるのが重要だと思います。  
+
