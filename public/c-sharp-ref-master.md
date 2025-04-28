@@ -1,11 +1,11 @@
 ---
 title: 【C#】参照渡しは副作用を理解した上で使用する【ref/out/修飾子なし】
 tags:
-  - 'C#'
-  - '参照渡し'
+  - C#
+  - 参照渡し
 private: false
-updated_at: ''
-id: null
+updated_at: '2025-04-28T11:10:24+09:00'
+id: 2c8facc210743db60914
 organization_url_name: null
 slide: false
 ignorePublish: false
