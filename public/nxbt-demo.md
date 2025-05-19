@@ -1,13 +1,13 @@
 ---
 title: nxbt-demo
 tags:
-  - nxbt
   - RaspberryPi
+  - bluetooth
   - NintendoSwitch
-  - Bluetooth
+  - nxbt
 private: true
-updated_at: '2025-05-19'
-id: null
+updated_at: '2025-05-19T22:01:42+09:00'
+id: 970879579dc1b746afab
 organization_url_name: null
 slide: false
 ignorePublish: false
