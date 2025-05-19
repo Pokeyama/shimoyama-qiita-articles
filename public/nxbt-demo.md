@@ -23,6 +23,9 @@ ignorePublish: false
 - **ラズパイ**：Raspberry Pi Zero 2 W（Raspberry Pi OS Lite 32-bit）  
 - **Switch**：Nintendo Switch 本体（最新システム Ver.16.0.0 以上推奨）  
 
+使用ライブラリ
+https://github.com/Brikwerk/nxbt
+
 ---
 
 # 前準備
