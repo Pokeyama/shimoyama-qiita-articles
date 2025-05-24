@@ -1,154 +1,20 @@
 shimoyama@nxbt:~ $ history
-    1  sudo apt update
-    2  sudo apt upgrade -y
-    3  sudo apt install -y python3-venv python3-pip dbus-user-session avahi-daemon
-    4  sudo systemctl enable --now avahi-daemon
-    5  python3 -m venv nxbt-venv
-    6  source nxbt-venv/bin/activate
-    7  pip install --upgrade pip
-    8  pip install nxbt
-    9  nxbt webapp -i 0.0.0.0
-   10  pip install --upgrade pip
-   11  pip uninstall -y jinja2 itsdangerous flask werkzeug eventlet
-   12  pip install   jinja2==3.0.3   itsdangerous==2.0.1   flask==1.1.2   werkzeug==1.0.1   eventlet==0.30.2
-   13  nxbt webapp -i 0.0.0.0
-   14  sudo
-   15  sudo nxbt webapp -i 0.0.0.0
-   16  deactivate
-   17  sudo nxbt webapp -i 0.0.0.0
-   18  ll
-   19  ls
-   20  sudo nxbt-venv/bin/nxbt webapp -i 0.0.0.0
-   21  source nxbt-venv/bin/activate
-   22  vim spam_a.py
-   23  vi spam_a.py
-   24  chmod +x ~/spam_a.py
-   25  sudo ~/nxbt-venv/bin/python ~/spam_a.py
-   26  deactivate
-   27  vi spamA.sh
-   28  chmod +x ~/spamA.sh
-   29  ~/spamA.sh
-   30  sudo ~/nxbt-venv/bin/python ~/spam_a.py
-   31  vi spamA.py
-   32  chmod +x ~/spamA.py
-   33  source ~/nxbt-venv/bin/activate
-   34  sudo ~/nxbt-venv/bin/python ~/spamA.py
-   35  sudo nxbt-venv/bin/nxbt webapp -i 0.0.0.0
-   36  deactivate
-   37  sudo ~/nxbt-venv/bin/python ~/spamA.py
-   38  sudo nxbt-venv/bin/nxbt webapp -i 0.0.0.0
-   39  sudo ~/nxbt-venv/bin/python ~/spam_a.py
-   40  ~
-   41  sudo ~/nxbt-venv/bin/python ~/spamA.py
-   42  vi sample.py
-   43  sudo ~/nxbt-venv/bin/python ~/sample.py
-   44  pip3
-   45  sudo pip3 install nxbt
-   46  sudo nxbt -h
-   47  sudo nxbt macro -c "B 0.1s\n 0.1s"
-   48  sudo nxbt macro -c "B 0.1s\n 0.1s" -r
-   49  sudo nxbt macro -c "B 0.1s\n 0.1s"
-   50  sudo nxbt macro -c "B 0.1s\n 0.1s" -r
-   51  sudo nxbt webapp
-   52  exit
-   53  shutdown
-   54  sudo shutdown
-   55  exit
-   56  ll
-   57  ls
-   58  rm -rf nxbt-venv/
-   59  ls
-   60  rm -rf sample.py
-   61  rm -rf spam_a.py
-   62  rm -rf spamA.py
-   63  rm -rf spamA.sh
-   64  sudo pip3 install nxbt
-   65  sudo nxbt demo
-   66  sudo systemctl status bluetooth
-   67  sudo bluetoothctl show
-   68  sudo sed -i '/^ExecStart.*bluetoothd$/ s/$/ --experimental/' /lib/systemd/system/bluetooth.service
-   69  sudo systemctl daemon-reload
-   70  sudo systemctl restart bluetooth
-   71  sudo bluetoothctl
-   72  sudo nxbt demo
-   73  sudo pip3 uninstall nxbt
-   74  sudo pip3 install nxbt
-   75  sudo nxbt demo
-   76  sudo nxbt webapp
-   77  sudo nxbt demo
-   78  bluetoothctl show
-   79  vi /etc/bluetooth/main.conf
-   80  sudo vi /etc/bluetooth/main.conf
-   81  sudo apt install vim
-   82  sudo vim /etc/bluetooth/main.conf
-   83  sudo systemctl daemon-reload
-   84  sudo systemctl restart bluetooth
-   85  sudo bluetoothctl
-   86  sudo nxbt demo
-   87  sudo systemctl edit bluetooth.service
-   88  sudo systemctl daemon-reload
-   89  sudo systemctl restart bluetooth
-   90  sudo nxbt demo
-   91  sudo reboot
-   92  sudo nxbt demo
-   93  sudo apt purge bluez
-   94  sudo rm -f /etc/bluetooth/main.conf
-   95  sudo rm -f /etc/systemd/system/bluetooth.service.d/override.conf
-   96  sudo apt install bluez
-   97  sudo nxbt demo
-   98  sudo nxbt webapp
-   99  sudo nxbt demo
-  100  sudo nxbt webapp
-  101  sudo pip3 uninstall Jinja2
-  102  sudo pip3 install Jinja2==3.0.3
-  103  sudo nxbt webapp
-  104  sudo pip3 uninstall itsdangerous
-  105  sudo pip3 install itsdangerous==2.0.1
-  106  sudo nxbt webapp
-  107  sudo pip3 uninstall -y Flask Jinja2 itsdangerous Werkzeug
-  108  sudo pip3 install   Flask==2.0.3   Jinja2==3.0.3   itsdangerous==2.0.1   Werkzeug==2.0.3
-  109  sudo nxbt webapp
-  110  vim spam_a.py
-  111  chmod +x spam_a.py
-  112  sudo ./spam_a.py
-  113  vim spam_a.py
-  114  rm -rf spam_a.py
-  115  vim spam_a.py
-  116  chmod +x spam_a.py
-  117  sudo ./spam_a.py
-  118  rm -rf spam_a.py
-  119  vim spam_a.py
-  120  chmod +x spam_a.py
-  121  sudo ./spam_a.py
-  122  vim spam_a.py
-  123  rm -rf spam_a.py
-  124  vim spam_a.py
-  125  chmod +x spam_a.py
-  126  sudo ./spam_a.py
-  127  rm -rf spam_a.py
-  128  vim spam_a.py
-  129  chmod +x spam_a.py
-  130  sudo ./spam_a.py
-  131  rm -rf spam_a.py
-  132  vim spam_a.py
-  133  chmod +x spam_a.py
-  134  sudo ./spam_a.py
-  135  rm -rf spam_a.py
-  136  vim spam_a.py
-  137  chmod +x spam_a.py
-  138  sudo ./spam_a.py
-  139  rm -rf spam_a.py
-  140  vim spam_a.py
-  141  chmod +x spam_a.py
-  142  sudo ./spam_a.py
-  143  sudo apt install tmux
-  144  tmux new -s spam
-  145  tmux attach -t spam
-  146  exit
-  147  sudo ./spam_a.py
-  148  exit
-  149  tmux attach -t spam
-  150  tmux new -s spam
-  151  tmux attach -t spam
-  152  tmux new -s spam
-  153  exit
+    1  sudo apt update && sudo apt full-upgrade -y
+    2  sudo apt install -y python3-pip vim tmux
+    3  sudo apt purge -y bluez
+    4  sudo rm -f /etc/bluetooth/main.conf
+    5  sudo rm -f /etc/systemd/system/bluetooth.service.d/override.conf
+    6  sudo apt install -y bluez
+    7  sudo vim /etc/bluetooth/main.conf
+    8  sudo systemctl daemon-reload
+    9  sudo systemctl restart bluetooth
+   10  sudo pip3 install --upgrade nxbt
+   11  sudo pip3 uninstall -y Flask Jinja2 itsdangerous Werkzeug
+   12  sudo pip3 install   Flask==2.0.3   Jinja2==3.0.3   itsdangerous==2.0.1   Werkzeug==2.0.3
+   13  sudo nxbt webapp --port 8080
+   14  sudo nxbt webapp
+   15  sudo nxbt demo
+   16  vim bp_auto.py
+   17  chmod +x bp_auto.py
+   18  sudo ./bp_auto.py
+   19  history
