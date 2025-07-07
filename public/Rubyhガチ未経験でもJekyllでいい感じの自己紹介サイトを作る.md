@@ -1,4 +1,4 @@
----
+<!-- ---
 title: Ruby未経験でもできる！Jekyllで転職活動用の自己紹介サイトを作成する
 tags:
   - Ruby
@@ -389,4 +389,4 @@ https://pokeyama.github.io/portfolio-jekyll/
 
 https://www.pakutaso.com/20230556126post-46690.html
 
-https://icons8.jp/icons/set/docker-image
+https://icons8.jp/icons/set/docker-image -->
