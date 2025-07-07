@@ -5,8 +5,8 @@ tags:
   - Jekyll
   - 転職
   - ポートフォリオ
-private: true
-updated_at: '2024-11-11T12:51:09+09:00'
+private: false
+updated_at: '2025-07-07T20:41:14+09:00'
 id: 19e2ede05b76af50924e
 organization_url_name: null
 slide: false
