@@ -3,7 +3,7 @@ title: test_post006
 tags:
   - Node.js
 private: true
-updated_at: '2025-07-07T20:41:14+09:00'
+updated_at: '2025-07-07T21:19:23+09:00'
 id: 3c9e7a78df7667a27c66
 organization_url_name: null
 slide: false

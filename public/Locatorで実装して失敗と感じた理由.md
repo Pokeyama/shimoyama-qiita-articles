@@ -6,7 +6,7 @@ tags:
   - デザインパターン
   - DependencyInjection
 private: true
-updated_at: '2025-07-07T20:41:14+09:00'
+updated_at: '2025-07-07T21:19:23+09:00'
 id: 35d1031de2276776e569
 organization_url_name: null
 slide: false
