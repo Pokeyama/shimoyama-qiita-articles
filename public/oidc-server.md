@@ -1,13 +1,13 @@
 ---
 title: 認証サーバーを自分で作って理解する @ OpenID Connect
 tags:
-  - 'Node.js'
-  - 'Hono'
-  - 'TypeScript'
-  - 'openid_connect'
+  - Node.js
+  - TypeScript
+  - openid_connect
+  - Hono
 private: false
-updated_at: ''
-id: null
+updated_at: '2025-08-02T23:40:46+09:00'
+id: c20e224b6f9a80177580
 organization_url_name: null
 slide: false
 ignorePublish: false
