@@ -106,6 +106,7 @@ services:
 
 https://github.com/Pokeyama/minimal-oidc-auth-server-vue-client/blob/main/server/src/index.ts
 
+
 ### RSAキー
 署名検証のためのキーペアを作成してJWKの形でキャッシュしておきます。
 このキーは一度生成した後、一定時間でローテーションされるように実装するのが望ましいです。
@@ -354,9 +355,10 @@ export default defineComponent({
 </script>
 ```
 
-`nonce`と`state`もチェックしておきますが、違いがわからなくなりますが、検証時の取得方法がそれぞれ違うのが味噌ですね。
+`nonce`と`state`もチェックしましょう。違いがわからなくなりますが、検証時の取得方法がそれぞれ違うのが味噌ですね。
 
 https://qiita.com/m28/items/10c3a1de1bdcfda874b1
+
 
 ~~ちゃんとチェックしてる実装見たことがない~~
 
