@@ -386,7 +386,7 @@ $ docker-compose up -d
 http://localhost:5173/
 
 エントリーページ
-![http://localhost:5173/](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/9cf70483-b9c7-4d12-9367-c22b03008d6c.png)
+![スクリーンショット 2025-08-02 23.45.10.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/b64012bd-9559-454d-a346-e21c78add5a7.png)
 
 認証画面
 ![スクリーンショット 2025-08-02 22.47.40.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/7b380df4-c276-4a40-8937-d63ee8810e1f.png)
