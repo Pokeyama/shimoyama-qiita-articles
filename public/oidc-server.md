@@ -1,5 +1,5 @@
 ---
-title: 認証サーバーを自分で作って理解する @ OpenID Connect
+title: 認可サーバーを自分で作って理解する @ OpenID Connect
 tags:
   - Node.js
   - TypeScript
@@ -13,7 +13,7 @@ slide: false
 ignorePublish: false
 ---
 # はじめに
-OpenID Connectで作られた認証サーバーを自分で作って認証する側を理解しようという記事です。
+OpenID Connectで作られた認可サーバーを自分で作って認証する側を理解しようという記事です。
 サーバーはNode(Hono)、クライアントはVueで作っていきます。
 **※この記事の実装は学習目的のため、認証情報の保存や鍵管理については本番環境に耐えるよう強化が必要です。**
 
