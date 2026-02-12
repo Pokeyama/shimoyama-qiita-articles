@@ -1,11 +1,11 @@
 ---
 title: Macに固執するのはやめよう「社内標準に乗る」大事さ
 tags:
-  - 'Mac'
-  - 'Windows'
+  - Mac
+  - Windows
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-02-12T17:21:41+09:00'
+id: 17c859d2cae36fa3ac9d
 organization_url_name: null
 slide: false
 ignorePublish: false
