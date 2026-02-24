@@ -2,11 +2,11 @@
 title: ISUCON12予選問題をGoで性能改善してみた（初学者ログ）
 tags:
   - Go
-  - ISUCON
+  - isucon
   - パフォーマンス
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-02-24T09:27:58+09:00'
+id: e6441db0afd97d54ec59
 organization_url_name: null
 slide: false
 ignorePublish: false
