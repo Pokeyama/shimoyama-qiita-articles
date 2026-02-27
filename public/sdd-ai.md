@@ -4,10 +4,7 @@ tags:
   - 仕様駆動開発
   - SDD
   - Codex
-  - ClaudeCode
   - 生成AI
-  - Go
-  - Vue.js
 private: false
 updated_at: ''
 id: null
