@@ -6,7 +6,7 @@ tags:
   - NintendoSwitch
   - nxbt
 private: true
-updated_at: '2026-02-24T09:27:58+09:00'
+updated_at: '2026-02-27T10:29:42+09:00'
 id: 970879579dc1b746afab
 organization_url_name: null
 slide: false

@@ -1,13 +1,13 @@
 ---
 title: Spec駆動開発 4つのmdで要件→設計→実装まで
 tags:
-  - 仕様駆動開発
-  - SDD
-  - Codex
+  - codex
+  - sdd
   - 生成AI
+  - 仕様駆動開発
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-02-27T10:29:43+09:00'
+id: 16a1d3c518ae5fdf8a62
 organization_url_name: null
 slide: false
 ignorePublish: false
