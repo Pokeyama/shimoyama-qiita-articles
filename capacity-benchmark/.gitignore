@@ -1,0 +1,5 @@
+# C# build artifacts
+csharp/bin/
+csharp/obj/
+# Go build output
+go/capacity-benchmark
