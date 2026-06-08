@@ -1,12 +1,12 @@
 ---
 title: 【C#/Go/PHP】配列の初期容量を指定するとどれだけ速くなるのか実測
 tags:
-  - C#
   - Go
+  - C#
 private: false
-updated_at: ''
-id: null
-organization_url_name: null
+updated_at: '2026-06-08T17:20:42+09:00'
+id: 7fe670abb8ccf6b9812a
+organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
 ---
@@ -158,6 +158,20 @@ xychart-beta
 
 100回ほど行ってみて全ての結果で指定ありのほうが結果は良かったのですが、数値にバラツキが結構あったので、GCのタイミングとかで変わりそうです。
 計測の仕方が悪いのかもしれない。
+
+:::note info
+**補足（[コメント](https://qiita.com/simoyama2323/items/7fe670abb8ccf6b9812a#comment-63397cfb5e59e1b1c0cd)より）**
+C# では `Enumerable.ToDictionary()` や、他のコレクションを渡す `Dictionary` のコンストラクタは、渡した相手が `ICollection<...>`（＝ `Count` を持つ）なら、その `Count` を自動で初期容量に使ってくれるそうです。つまり件数が事前に分かるケースは、手動で容量指定しなくても標準APIが裏で最適化してくれているわけですね。
+
+```csharp
+// list.Count 分の容量が自動で確保され、リサイズが起きない
+var dict = list.ToDictionary(x => x.Key, x => x.Value);
+```
+
+今回のベンチのように **`for` で1件ずつ `Add` する**＝件数が事前に分からない書き方だと、この自動化は効かないので手動の `new Dictionary<>(N)` に意味があります。
+
+なお、ハッシュテーブルはバケット数を素数にする設計のため、容量に渡した値は内部的に「**それ以上で最小の素数**」へ切り上げられるとのことです（`HashHelpers` 参照）。
+:::
 
 ## Go (1.26)
 
