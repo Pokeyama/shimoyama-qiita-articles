@@ -12,7 +12,7 @@ ignorePublish: false
 ---
 # はじめに
 
-X でこんなポストが流れてきました。　~~青バッヂインプ稼ぎのアレ~~
+X でこんなポストが流れてきました。
 
 https://x.com/theskilledcoder/status/2053002328643686605
 
