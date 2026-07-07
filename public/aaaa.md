@@ -8,12 +8,12 @@ tags:
 private: false
 updated_at: ''
 id: null
-organization_url_name: null
+organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
 ---
 # はじめに
-弊社のつよつよエンジニアに「最近は継承よりコンポジションやで」とご指摘頂いたのですが、よくわかってなかったので勉強したものをまとめます。
+当社のつよつよエンジニアに「最近は継承よりコンポジションやで」とご指摘頂いたのですが、よくわかってなかったので勉強したものをまとめます。
 Go使ってる人はすんなり入ってくるというか、普段から意識しているような内容かと思います。
 
 「継承よりコンポジション（Composition over Inheritance）」自体は最近の言葉ではなく、GoFのデザインパターン本（1994年）の時点で「クラス継承よりもオブジェクトコンポジションを多用すること」として挙げられていた原則みたいですね。
