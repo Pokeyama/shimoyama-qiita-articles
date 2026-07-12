@@ -1,5 +1,5 @@
 ---
-title: いい加減説明できるようになりたいUnit of Workパターン
+title: Unit of Workパターンを体系的に学んでみた
 tags:
   - C#
   - .NET
