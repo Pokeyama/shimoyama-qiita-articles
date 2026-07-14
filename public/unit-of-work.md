@@ -5,8 +5,8 @@ tags:
   - .NET
   - デザインパターン
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-07-14T10:50:20+09:00'
+id: 54b8b211ababdbfe6dcf
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
