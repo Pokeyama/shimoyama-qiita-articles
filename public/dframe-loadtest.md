@@ -17,7 +17,7 @@ ignorePublish: false
 
 業務でMagicOnion(gRPC+MessagePack)なAPIサーバーの負荷試験をすることになりました。
 
-負荷試験ツールといえばk6やLocustが定番ですが、あれらはHTTP/JSONを前提にしたツールです。MessagePackでシリアライズされたgRPCを叩く手段がないので、MagicOnionのAPIには使えません（JSON変換用のエンドポイントを別に生やして叩く手はありますが、本番と別経路を計測しても数字の意味がないので却下）。
+負荷試験ツールといえばk6やJMeterが定番ですが、あれらはHTTP/JSONを前提にしたツールです。MessagePackでシリアライズされたgRPCを叩く手段がないので、MagicOnionのAPIには使えません（JSON変換用のエンドポイントを別に生やして叩く手はありますが、本番と別経路を計測しても数字の意味がないので却下）。
 
 そこで[DFrame](https://github.com/Cysharp/DFrame)です。Cysharp製の分散負荷試験フレームワークで、**シナリオをC#で書ける**ため、gRPCだろうがMagicOnionだろうがクライアントコードがそのまま負荷シナリオになります。
 
@@ -183,7 +183,7 @@ Durationの注意点として、時間切れの瞬間に飛行中だったリク
 
 # で、Ramp-Upはどこ？
 
-負荷試験といえば「同時接続数を徐々に増やしていって、どこで壊れるかを見る」のが定番です。k6なら`stages`、Locustなら`spawn rate`で負荷の傾斜を作れます。DFrameで同じことをやろうとして設定画面を探しました。
+負荷試験といえば「同時接続数を徐々に増やしていって、どこで壊れるかを見る」のが定番です。k6なら`stages`、JMeterならThread GroupのRamp-Up Periodで負荷の傾斜を作れます。DFrameで同じことをやろうとして設定画面を探しました。
 
 **無い。**
 
