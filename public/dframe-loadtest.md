@@ -1,5 +1,5 @@
 ---
-title: DFrameで負荷試験を始めたら「Ramp-Up」が無かった話
+title: DFrameでMagicOnionサーバの負荷試験@Ramp-Upをどうするか
 tags:
   - C#
   - 負荷試験
