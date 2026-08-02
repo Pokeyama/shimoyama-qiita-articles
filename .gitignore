@@ -6,3 +6,4 @@ php/.env
 .env
 yarn.lock
 .vscode
+.claude
