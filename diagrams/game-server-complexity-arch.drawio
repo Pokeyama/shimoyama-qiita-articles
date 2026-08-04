@@ -1,0 +1,63 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="構成" id="arch">
+    <mxGraphModel dx="900" dy="600" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="520" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="boxServer" value="サーバー" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#BDBDBD;dashed=1;dashPattern=6 6;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=13;fontColor=#757575;" vertex="1" parent="1">
+          <mxGeometry x="40" y="170" width="760" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="boxStore" value="データストア" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#BDBDBD;dashed=1;dashPattern=6 6;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=13;fontColor=#757575;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="760" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="client" value="クライアント" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="340" y="40" width="140" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="api" value="APIサーバー" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=14;" vertex="1" parent="boxServer">
+          <mxGeometry x="40" y="40" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="gs" value="対戦サーバー" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=14;" vertex="1" parent="boxServer">
+          <mxGeometry x="290" y="40" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mm" value="マッチングサーバー" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=14;" vertex="1" parent="boxServer">
+          <mxGeometry x="540" y="40" width="170" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rdb" value="RDB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=13;" vertex="1" parent="boxStore">
+          <mxGeometry x="55" y="38" width="120" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="Redis" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=13;" vertex="1" parent="boxStore">
+          <mxGeometry x="435" y="38" width="120" height="62" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" value="HTTP" style="edgeStyle=none;html=1;rounded=0;strokeColor=#555555;strokeWidth=1.5;endArrow=blockThin;endFill=1;fontSize=12;fontColor=#555555;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="client" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" value="常時接続" style="edgeStyle=none;html=1;rounded=0;strokeColor=#555555;strokeWidth=1.5;endArrow=blockThin;endFill=1;fontSize=12;fontColor=#555555;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="client" target="gs">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" value="HTTP" style="edgeStyle=none;html=1;rounded=0;strokeColor=#555555;strokeWidth=1.5;endArrow=blockThin;endFill=1;fontSize=12;fontColor=#555555;labelBackgroundColor=#FFFFFF;" edge="1" parent="1" source="client" target="mm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e4" style="edgeStyle=none;html=1;rounded=0;strokeColor=#555555;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="api" target="rdb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=none;html=1;rounded=0;strokeColor=#555555;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="gs" target="redis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=none;html=1;rounded=0;strokeColor=#555555;strokeWidth=1.5;endArrow=blockThin;endFill=1;" edge="1" parent="1" source="mm" target="redis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e7" value="試合結果" style="edgeStyle=none;html=1;rounded=0;dashed=1;dashPattern=4 4;strokeColor=#9E9E9E;strokeWidth=1.5;endArrow=blockThin;endFill=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;fontColor=#9E9E9E;labelBackgroundColor=#FAFAFA;" edge="1" parent="1" source="gs" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

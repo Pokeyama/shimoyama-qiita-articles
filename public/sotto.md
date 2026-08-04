@@ -1,5 +1,5 @@
 ---
-title: 【Swift】完全ローカルで会議を録音+文字起こしするmacOSメニューバーアプリ「Sotto」を作った
+title: 完全ローカルで会議を「そっと」録音+「そっと」文字起こしするmacOSアプリ「Sotto」を作った
 tags:
   - Swift
   - 個人開発
@@ -23,7 +23,7 @@ Speech-to-TextとGeminiをつないだCLIで、60分130円かかります。
 あとこのツールの問題ですが、音声をGCSにあげるのもなんか微妙です。
 
 macOS Tahoe 26から音声APIに（個人的に）革新的なモノが追加されていたので、メニューバーアプリとして作り直しました。
-Sottoといいます。（"そっと"録音するから）
+Sottoといいます。
 
 ##### Sottoちゃん
 <img src="https://raw.githubusercontent.com/yhrym/Sotto/main/.github/assets/sotto-app-icon-v2.png" width="144" alt="Sottoのアプリアイコン">
@@ -93,7 +93,6 @@ https://github.com/yhrym/Sotto
 
 # 環境
 macOS 26.0以上
-Xcode 26.x（Swift言語モード6）
 **文字起こしを使う場合はAppleシリコンが搭載されているMacが必要です**
 
 macOS 26はIntel Macにも入りますが、`SpeechTranscriber`のモデルがAppleシリコン前提なので、Intel機だと録音までしかできません。
@@ -105,24 +104,11 @@ https://github.com/yhrym/Sotto/releases/latest
 
 展開して`Sotto.app`をApplicationsへ移します。
 一度開くと警告が出るので、閉じてから`システム設定 > プライバシーとセキュリティ`の「このまま開く」を押します。
-警告が出るのはDeveloper IDで署名していないからなので、この手順は初回だけです。
+警告が出るのはDeveloper IDで署名していないからなので、この手順は初回のみ。
 
-録音を始めるときに、マイクと画面収録の権限を聞かれます。
-
-入れたあと、そのアプリが何を要求しているかは1行で確認できます。
-
-```bash
-codesign -d --entitlements - /Applications/Sotto.app
-```
-
-ここにネットワーク関連のentitlementが出てこないことが、この記事の後半の話につながります。
-
-# なぜ今まで作らなかったか
+# 以下、過去のmacOSでのネックだった部分
 録音そのものは昔からできます。
 [`AVAudioRecorder`](https://developer.apple.com/documentation/avfaudio/avaudiorecorder)はmacOS 10.7、[`AVAudioEngine`](https://developer.apple.com/documentation/avfaudio/avaudioengine)は10.10からあって、どちらも時間の制限はありません。
-上限はディスクの空きだけです。
-
-以下問題だった部分
 
 ## システム音声が録れなかった
 マイクと違って、他のアプリが鳴らしている音は標準APIでは取れませんでした。
@@ -134,8 +120,8 @@ https://github.com/ExistentialAudio/BlackHole
 ScreenCaptureKitの[`capturesAudio`](https://developer.apple.com/documentation/screencapturekit/scstreamconfiguration/capturesaudio)がmacOS 13から入って、ここが標準APIだけで済むようになりました。
 マイクも同じ`SCStream`から受け取れる[`captureMicrophone`](https://developer.apple.com/documentation/screencapturekit/scstreamconfiguration/capturemicrophone)はmacOS 15からです。
 
-それ以前は、システム音声をScreenCaptureKit、マイクを`AVAudioEngine`で別々に回すことになります。
-時計の基準が違う2つを自前で合わせる必要があって、後述の[2系統は到着順に並べられない](#2系統は到着順に並べられない)をもっと面倒な条件でやることになります。
+それ以前は、システム音声をScreenCaptureKit、マイクを`AVAudioEngine`で別々に録音する必要がありました。
+再生時間の基準が違う2つを組み合わせる必要があって、後述の[2系統は到着順に並べられない](#2系統は到着順に並べられない)を面倒な条件でやることになります。
 
 ## 長い音声の文字起こしができなかった
 Appleの音声認識自体は昔からあります。
@@ -150,11 +136,11 @@ Appleの音声認識自体は昔からあります。
 
 そこにmacOS 26で`SpeechAnalyzer`と`SpeechTranscriber`が入りました。
 音声ファイルを最後まで流し込んで、端末内で認識できます。
-ドキュメントに長さの制限の記載はなく、実際に52分の録音を分割せずそのまま1本通せています。
+ドキュメントに長さの制限の記載はなく、実際に120分の録音を分割せずそのまま起こすことができました。
 
 https://developer.apple.com/documentation/speech/speechanalyzer
 
-残っていた文字起こし側がmacOS 26で埋まったので、このタイミングで作りました。
+残っていた文字起こしがとても楽になったので、このタイミングで作りました。
 
 # ハマったポイント
 
