@@ -4,11 +4,11 @@ tags:
   - Swift
   - 個人開発
   - macOS
-  - ScreenCaptureKit
+  - screencapturekit
   - 音声認識
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-08-04T10:30:50+09:00'
+id: c41e40daf888e06010a2
 organization_url_name: null
 slide: false
 ignorePublish: false
