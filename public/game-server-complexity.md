@@ -7,8 +7,8 @@ tags:
   - アーキテクチャ
   - サーバーサイド
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-08-06T11:20:13+09:00'
+id: 86b54e7f4bfba9de77e3
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
