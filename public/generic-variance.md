@@ -110,7 +110,6 @@ flowchart LR
 共変は継承と同じ向き、反変は逆向きです。
 反変については後述します。
 
-約束なので、破るとちゃんと怒られます。
 インターフェースで試すと分かりやすいです。
 
 ```csharp
@@ -123,15 +122,13 @@ public interface IBox<out T>
 ```
 
 `T Take();`だけのときはビルドが通ります。
-`void Put(T item);`を1行足した瞬間にCS1961です。
+`void Put(T item);`を1行追加したらエラーです。
 
 `out`は**読み取り専用にした型にしか付けられません**。
 
-## 知らないまま使っていた
-仕事のコードにそのまま出てきていました。
-
-ミッションの達成判定サービスがあって、ゲーム内の出来事は`MissionEvent`を基底とする継承階層で表しています。
-実際のコードの超簡略版が以下です。
+## 実践
+現在設計しているゲーム案件で利用してみました。
+例えばミッションの達成判定サービスがあって、ゲーム内の出来事は`MissionEvent`を基底とする継承階層で表しているとします。
 
 ```csharp
 public abstract record MissionEvent;
@@ -146,7 +143,7 @@ public interface IMissionService
 ```
 
 呼び出し側は`List<RewardGrantedMissionEvent>`をそのまま渡しています。
-これが通っていたのは`IReadOnlyCollection<out T>`が共変だからで、引数を`ICollection<MissionEvent>`に変えると即座に止まります。
+これが通っていたのは`IReadOnlyCollection<out T>`が共変だからで、引数を`ICollection<MissionEvent>`に変えると即座に止まってくれます。
 
 ```csharp
 // void Evaluate(ICollection<MissionEvent> events) だった場合
@@ -154,16 +151,13 @@ Evaluate(events);
 // error CS1503: Argument 1: cannot convert from 'System.Collections.Generic.List<RewardGrantedMissionEvent>' to 'System.Collections.Generic.ICollection<MissionEvent>'
 ```
 
-自分はこれを説明できないまま毎日書いていました。
-
-そして最初の疑問の答えですが、順番が逆でした。
-
-イミュータブルなのに`out`が付いているのではなく、**イミュータブル（出力専用）だから`out`を付けられる**が正しい。
+なので当初の理解は間違えていて、
+イミュータブルなのに`out`が付いているのではなく、**イミュータブル（出力専用）だから`out`を付けられる**が正しい解釈になるかと思います。
 読み取り専用で設計したから共変にできる、という関係です。
 
 # 反変（in）は向きが逆
 `out`の逆が`in`で、`T`を引数にしか使わない型に付きます。
-デリゲートの共変・反変は実務で書いたことがなかったんですが、せっかくなので試しました。
+デリゲートの共変・反変は実務で書いたことがなかったんですが、勉強のために書いてみました。
 
 ```csharp
 Action<Animal> animalAction = a => Console.WriteLine(a);
@@ -215,12 +209,12 @@ array[0] = new Cat();
 自作のインターフェースに`out`を付けるかどうかは、読み取り専用で確定しているかだけで決めればいいと思います。
 
 取得系だけのつもりで`out`を付けた型に、あとから登録系のメソッドを足したくなっても、CS1961が出て足せません。
-公開済みのインターフェースだと、`out`を外すときに共変の代入をしている呼び出し側まで壊れます。
 
 `in`は自分で書く場面が思いつきませんでした。
 デリゲートを受け取る自作のAPIを設計するならありそうですが、そこまでの必要に迫られたことはないです。
 
-あと、参照渡しの`ref`/`out`/`in`とは名前が同じだけで無関係です。
+あと、参照渡しの`ref`/`out`/`in`とは名前が同じだけで無関係なので、根本から理解間違えていました。
+恥ずかしい。
 
 自分はここを混同していたせいで、`IReadOnlyList<out T>`を見るたびに毎回引っかかっていました。
 別物だと分けられただけで、だいぶすっきりしました。
