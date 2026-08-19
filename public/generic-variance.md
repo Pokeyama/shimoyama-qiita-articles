@@ -1,12 +1,12 @@
 ---
-title: '【C#】いい加減説明できるようにしたい共変性・反変性〜IEnumerable<out T>のout〜'
+title: 【C#】いい加減説明できるようにしたい共変性・反変性〜IEnumerable<out T>のout〜
 tags:
   - C#
   - .NET
   - ジェネリクス
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-08-19T11:17:02+09:00'
+id: af1e86d5a35b8df36a49
 organization_url_name: null
 slide: false
 ignorePublish: false
