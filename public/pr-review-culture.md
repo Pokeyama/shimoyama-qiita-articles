@@ -3,11 +3,11 @@ title: 【GitHub】PR文化がなかった弊社にPRを持ち込んだ話
 tags:
   - GitHub
   - コードレビュー
-  - PullRequest
+  - pullrequest
   - チーム開発
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-08-25T11:54:19+09:00'
+id: 3acdf6d66d04086feeae
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
