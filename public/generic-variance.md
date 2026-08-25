@@ -5,9 +5,9 @@ tags:
   - .NET
   - ジェネリクス
 private: false
-updated_at: '2026-08-19T11:17:02+09:00'
+updated_at: '2026-08-21T12:33:32+09:00'
 id: af1e86d5a35b8df36a49
-organization_url_name: null
+organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
 ---
@@ -29,7 +29,7 @@ https://qiita.com/simoyama2323/items/2c8facc210743db60914
 macOS
 以下のエラー文は全部、実際にコンパイルして出たものを貼っています。
 
-# List<Dog>はList<Animal>に入らない
+# `List<Dog>`は`List<Animal>`に入らない
 こういう型があるとします。
 
 ```csharp
