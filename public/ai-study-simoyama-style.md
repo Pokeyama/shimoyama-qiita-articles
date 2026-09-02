@@ -6,8 +6,8 @@ tags:
   - コードレビュー
   - 設計
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-09-02T12:16:24+09:00'
+id: 06f04484f81975f4c7e7
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
