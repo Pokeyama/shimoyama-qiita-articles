@@ -1,0 +1,22 @@
+services:
+  gitbucket:
+    build:
+      context: .
+    image: gitbucket-ci-dotnet:4.47.0
+    container_name: gitbucket-ci
+    ports:
+      # 8080がGitBucketのWeb、29418がgit over SSH
+      - "8080:8080"
+      - "29418:29418"
+    volumes:
+      # GITBUCKET_HOME(/root/.gitbucket -> /gitbucket)を丸ごと永続化
+      - ./data:/gitbucket
+      # プラグインjarは別マウントにして、dataを消してもjarが残るようにする
+      - ./plugins:/gitbucket/plugins
+      # NuGetキャッシュ。ci-pluginはビルドごとにHOMEを作り直すので
+      # ここを固定しておかないと毎回パッケージを取り直しになる
+      - nuget-cache:/opt/nuget/packages
+    restart: unless-stopped
+
+volumes:
+  nuget-cache:

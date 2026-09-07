@@ -8,3 +8,10 @@ yarn.lock
 .vscode
 .claude
 diagrams
+audio
+# gitbucket-ci: GitBucketのデータとプラグインjarはコミットしない
+gitbucket-ci/data/
+gitbucket-ci/plugins/**/*.jar
+gitbucket-ci/plugins/.installed/
+gitbucket-ci/sample-app/**/bin/
+gitbucket-ci/sample-app/**/obj/
