@@ -4,8 +4,8 @@ tags:
   - GitBucket
   - CI
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-09-07T16:35:44+09:00'
+id: ee247f205b56e38ce7be
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
