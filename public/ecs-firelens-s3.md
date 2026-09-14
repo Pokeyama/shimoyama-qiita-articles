@@ -18,9 +18,11 @@ ignorePublish: false
 CloudWatch高いですよねー
 CloudWatch Logsは取り込んだ量で課金されるので、入れた時点で課金が発生します。
 
-でもECSをそのまま構築するとデフォルトでCloudWatchに送られてしまいます。
-ということでFireLensをサイドカーとして追加して、nginxのアクセスログをS3に逃がすことで、エラー行だけCloudWatchに残して必要最低限な情報だけCloudWatchで見るようにしたいと思います。
-S3のほうは保管量とPUT回数で、取り込みは無料です。
+でもECSでログを残そうとすると、まず出てくるのが`awslogs`ドライバでのCloudWatch送りです。
+コンソールでタスク定義を作るとログ収集がデフォルトで有効になっていて、ロググループごと勝手に作られます。
+ということでFireLensをサイドカーとして追加して、nginxのアクセスログはS3に逃がします。
+CloudWatchにはエラー行だけ残して、必要最低限の情報だけ見るようにします。
+S3のほうは保管量とPUT回数だけの課金で、取り込みは無料です。
 Datadogのような外部SaaSへ送るところは書きません。
 
 # 環境
@@ -36,6 +38,10 @@ fluent-bitのバージョンはFluent Bit v1.9.10でした。
 
 # FireLens
 AWS公式のタスク定義パラメータのドキュメントは、一度は開いたことがあるのではないでしょうか。
+
+https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/task_definition_parameters.html#:~:text=%E3%82%B5%E3%83%9D%E3%83%BC%E3%83%88%E3%81%95%E3%82%8C%E3%81%A6%E3%81%84%E3%82%8B%E3%83%AD%E3%82%B0%E3%83%89%E3%83%A9%E3%82%A4%E3%83%90%E3%83%BC%E3%81%AF%20awslogs%E3%80%81splunk%E3%80%81awsfirelens%20%E3%81%A7%E3%81%99%E3%80%82
+
+
 `logDriver`のValid valuesを8個並べた直後に、こう書いてあります。
 
 > The supported log drivers are `awslogs`, `splunk`, and `awsfirelens`.
@@ -45,9 +51,39 @@ EC2起動タイプなら`fluentd`も`json-file`も`syslog`も使えますが、F
 Datadog等に送りたい場合も、FireLensを経由することになります。
 
 FireLensを使わずにCloudWatchの外へ出す方法もありますが、どれも微妙です。
-`awslogs`でCloudWatchに入れてからサブスクリプションフィルタとLambdaで転送する形は、取り込み料金が発生してしまうので安くしたいという話と噛み合いません。
-アプリから直接HTTPで送る形はログライブラリがベンダー依存になり、stdoutに出なくなるのでローカルでの挙動も変わります。
-Datadog Agentをサイドカーで同居させる形は、サイドカーが増えるところが結局同じです。（そもそもDataDogが高い）
+
+![ECSからログを外に出す4パターンの比較。①はCloudWatchを経由するため取り込み課金が残り、②はstdoutを通らず、③はサイドカーが増える。④のFireLensはS3へ全ログ、CloudWatchへはエラー行だけ送る](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/5ed5c651-83cc-4620-9fe7-5ac2a3f414d0.png)
+
+①の`awslogs`でCloudWatchに入れてからサブスクリプションフィルタとLambdaで転送する形は、取り込み料金が発生してしまうので安くしたいという話と噛み合いません。
+取り込みが半額のInfrequent Accessクラスにすればいいのでは、と思ったのですが、**IAクラスはサブスクリプションフィルタに対応していません**。安く入れる選択と、外へ転送する手段が両立しないようになっています。
+②のアプリから直接HTTPで送る形はログライブラリがベンダー依存になり、stdoutに出なくなるのでローカルでの挙動も変わります。
+③のDatadog Agentをサイドカーで同居させる形は、サイドカーが増えるところが結局同じです。
+残った④が今回やるFireLensです。
+
+## DatadogやNew Relicでいいのでは
+と思って調べたのですが、**ログの取り込み単価だけ見るとDatadogのほうが安い**です。
+2026年9月時点の定価で並べます。
+
+| | 取込 | 保管 | 探索 |
+| --- | --- | --- | --- |
+| CloudWatch Logs（東京・Standard） | `$0.76/GB` | `$0.033/GB・月` | Logs Insightsが`$0.0076/GB`スキャン |
+| CloudWatch Logs（東京・Infrequent Access） | `$0.38/GB` | `$0.033/GB・月` | 同上（Insightsの料金はStandardと同じ） |
+| S3（東京・Standard） | 無料（PUTが`$0.0047/1,000リクエスト`） | `$0.025/GB・月` | Athenaが`$5/TB`スキャン |
+| Datadog Logs | `$0.10/GB` | インデックスが`$1.70/100万イベント・月`（15日保持・年契約） | インデックス済みなら追加なし |
+| New Relic | 月100GBまで無料、以降`$0.40/GB` | 同左に含む | 同左に含む |
+
+高いのはCloudWatch Logsの`$0.76/GB`のほうなのでここだけ見ると、素直にDatadogへ送ればいいことになります。
+
+ただ、**SaaSの請求はログの量では決まりません**。
+Datadogは監視対象の数で、Infrastructure Proが`$15/ホスト・月`、APMが`$31/ホスト・月`です。
+New Relicは人数で、Full Platform UserのProが`$349/人・月`です。
+nginxのアクセスログを置いておきたいだけなのに、基本料が丸々乗ってきます。
+
+S3なら取込が無料で保管が`$0.025/GB・月`、探索も後からAthenaを乗せれば`$5/TB`スキャンで済みます。
+
+なお**FireLensとDatadogは排他ではありません**。
+optionsの`Name`を`datadog`にすればそのまま送れるので、今回は送り先をS3にしているだけです。
+ｓ
 
 # 構成
 `awsfirelens`という名前のログドライバが実際にあるわけではありません。
@@ -351,3 +387,11 @@ https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html
 https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html
 
 https://github.com/aws/aws-for-fluent-bit/tree/mainline/use_cases/init-process-for-fluent-bit
+
+https://aws.amazon.com/jp/cloudwatch/pricing/
+
+https://aws.amazon.com/jp/s3/pricing/
+
+https://www.datadoghq.com/pricing/
+
+https://newrelic.com/pricing
