@@ -6,8 +6,8 @@ tags:
   - Fargate
   - Terraform
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-10-05T08:23:20+09:00'
+id: 1b00a2140b889bfedf63
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
