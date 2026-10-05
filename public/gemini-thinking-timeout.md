@@ -5,7 +5,7 @@ tags:
   - VertexAI
   - GoogleCloud
 private: false
-updated_at: '2026-10-05T12:28:26+09:00'
+updated_at: '2026-10-05T12:34:20+09:00'
 id: bc3dd1d2109568834a02
 organization_url_name: advancednet-inc
 slide: false
