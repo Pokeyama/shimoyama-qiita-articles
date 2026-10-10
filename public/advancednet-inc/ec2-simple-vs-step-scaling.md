@@ -56,7 +56,7 @@ https://docs.aws.amazon.com/ja_jp/autoscaling/ec2/userguide/simple-scaling-polic
 ![step-scaling-policy.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/9f633883-0fb1-4961-89c4-828e21b4f8fb.png)
 
 シンプルと違ってスケーリング中もアラームに反応してくれます。
-クールダウンはなく、代わりに新しく起動したインスタンスにウォームアップ時間があります。
+ポリシーにクールダウンの設定はなく、代わりに新しく起動したインスタンスにウォームアップ時間があります。
 
 AWSのドキュメントでも、増減数が1種類しかなくてもステップを使うよう推奨されています。
 なので**シンプルスケーリングの上位互換**と巷では言われています。
@@ -87,7 +87,8 @@ https://docs.aws.amazon.com/ja_jp/autoscaling/ec2/userguide/ec2-auto-scaling-sca
 ポリシーに書く`cooldown`はデフォルトの待ち時間を上書きするもので、止まる範囲が変わるわけではなさそう。（ドキュメントにはっきりとは書いていない）
 
 また、何があろうとこの時間はスケールしない、というわけでもないです。
-スケジュールされたアクションや、unhealthyになったインスタンスの置き換え、ステップやターゲット追跡のポリシーはクールダウンを待たずに動きます。
+スケジュールされたアクションや、unhealthyになったインスタンスの置き換え、ステップやターゲット追跡のスケールアウトはクールダウンを待たずに動きます。
+ステップやターゲット追跡でも、スケールインはクールダウン中だと遅れることがあるみたいです。
 手動でのスケールもデフォルトでは待ちません。
 
 terraformで書くとこのようになります。
@@ -170,7 +171,7 @@ resource "aws_autoscaling_policy" "step_scale_out" {
   policy_type             = "StepScaling"
   autoscaling_group_name  = aws_autoscaling_group.example.name
   adjustment_type         = "ChangeInCapacity"
-  metric_aggregation_type = "Average" # アラームのstatisticと合わせる
+  metric_aggregation_type = "Average" # 省略してもAverage
 
   # 60〜80%
   step_adjustment {
