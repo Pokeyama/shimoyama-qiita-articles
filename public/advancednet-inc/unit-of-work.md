@@ -10,6 +10,8 @@ id: 54b8b211ababdbfe6dcf
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 Repositoryパターンを調べているとほぼ確実にセットで出てくる「Unit of Work」

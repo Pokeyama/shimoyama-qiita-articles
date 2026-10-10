@@ -10,6 +10,8 @@ id: e6441db0afd97d54ec59
 organization_url_name: null
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 ISUCON12予選問題をGoで触ってみたので、Go初学者目線でやったことをまとめます。
