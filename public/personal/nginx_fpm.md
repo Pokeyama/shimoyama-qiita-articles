@@ -11,6 +11,8 @@ id: 624c1f4fbc5ce968d1a8
 organization_url_name: null
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 Nginx+PHP-FPM構成のAPIサーバーでS3から画像をストリーミングレスポンスするAPIを作成しました。

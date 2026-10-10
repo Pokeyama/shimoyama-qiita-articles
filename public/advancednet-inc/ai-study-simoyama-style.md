@@ -11,6 +11,8 @@ id: 06f04484f81975f4c7e7
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 大AIエージェント時代が訪れて1年くらい経ちましたでしょうか。

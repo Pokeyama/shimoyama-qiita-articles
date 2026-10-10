@@ -9,6 +9,8 @@ id: 64ccabd711246f5766d3
 organization_url_name: null
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 「非同期処理って体感的にわかるくらい変わるんスカ？」と先生に聞いたところ、以下のAPIに大量のリクエスト送ってみろと言われたのでやってみました。
