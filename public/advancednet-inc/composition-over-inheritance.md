@@ -11,6 +11,8 @@ id: 56bf78a4c7e7f9327a93
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
+posting_campaign_uuid: 783b7a849caf11eefd91
+agreed_posting_campaign_term: true
 ---
 # はじめに
 当社のつよつよエンジニアに「最近は継承よりコンポジションやで」とご指摘頂いたのですが、よくわかってなかったので勉強したものをまとめます。
