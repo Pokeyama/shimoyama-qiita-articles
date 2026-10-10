@@ -1,5 +1,5 @@
 {
   "devDependencies": {
-    "@qiita/qiita-cli": "github:Pokeyama/qiita-cli#dev"
+    "@qiita/qiita-cli": "^1.10.0"
   }
 }
