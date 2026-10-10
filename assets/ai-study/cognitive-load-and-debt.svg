@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="760" viewBox="0 0 1440 760" role="img" aria-labelledby="title desc">
+  <title id="title">認知負荷と認知負債の違い</title>
+  <desc id="desc">実装時に理解の負荷を払う場合と、理解せず進んで変更や障害時に負債を払う場合を比較する</desc>
+  <defs>
+    <style>
+      .base { font-family: "Hiragino Sans", "Yu Gothic", sans-serif; fill: #24272b; }
+      .title { font-size: 44px; font-weight: 700; }
+      .sub { font-size: 22px; fill: #687078; }
+      .lane { font-size: 26px; font-weight: 700; }
+      .box-title { font-size: 23px; font-weight: 700; }
+      .small { font-size: 20px; fill: #525a62; }
+      .tag { font-size: 20px; font-weight: 700; }
+      .conclusion { font-size: 27px; font-weight: 700; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#899198"/>
+    </marker>
+  </defs>
+
+  <rect width="1440" height="760" rx="28" fill="#fbfbf8"/>
+  <text class="base title" x="72" y="78">認知負荷は「今払う」、認知負債は「あとで払う」</text>
+  <text class="base sub" x="72" y="118">理解を省略すると、その場は速くても変更時に調査から始まる</text>
+
+  <line x1="285" y1="175" x2="1320" y2="175" stroke="#899198" stroke-width="3" marker-end="url(#arrow)"/>
+  <text class="base small" x="285" y="157" text-anchor="middle">実装時</text>
+  <text class="base small" x="790" y="157" text-anchor="middle">運用中</text>
+  <text class="base small" x="1240" y="157" text-anchor="middle">変更・障害</text>
+
+  <rect x="60" y="215" width="1320" height="190" rx="22" fill="#f0f7ed" stroke="#badab0" stroke-width="2"/>
+  <text class="base lane" x="92" y="263">理解して進む</text>
+  <rect x="92" y="285" width="150" height="44" rx="22" fill="#55a844"/>
+  <text class="tag" x="167" y="314" text-anchor="middle" fill="#fff">今払う負荷</text>
+
+  <g transform="translate(300 248)">
+    <rect width="150" height="92" rx="16" fill="#fff" stroke="#9fc994" stroke-width="3"/>
+    <rect x="175" width="150" height="92" rx="16" fill="#fff" stroke="#9fc994" stroke-width="3"/>
+    <rect x="350" width="150" height="92" rx="16" fill="#fff" stroke="#9fc994" stroke-width="3"/>
+    <text class="base box-title" x="75" y="55" text-anchor="middle">読む</text>
+    <text class="base box-title" x="250" y="55" text-anchor="middle">調べる</text>
+    <text class="base box-title" x="425" y="55" text-anchor="middle">判断する</text>
+  </g>
+  <line x1="820" y1="294" x2="1080" y2="294" stroke="#70a764" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect x="1100" y="248" width="230" height="92" rx="16" fill="#d8edcf"/>
+  <text class="base box-title" x="1215" y="286" text-anchor="middle">変更点を追える</text>
+  <text class="base small" x="1215" y="318" text-anchor="middle">判断理由も説明できる</text>
+
+  <rect x="60" y="430" width="1320" height="210" rx="22" fill="#fff4e8" stroke="#efc188" stroke-width="2"/>
+  <text class="base lane" x="92" y="478">理解せず進む</text>
+  <rect x="92" y="500" width="170" height="44" rx="22" fill="#e68a31"/>
+  <text class="tag" x="177" y="529" text-anchor="middle" fill="#fff">あとで払う負債</text>
+
+  <rect x="300" y="478" width="210" height="94" rx="16" fill="#fff" stroke="#e7ae6b" stroke-width="3"/>
+  <text class="base box-title" x="405" y="517" text-anchor="middle">動いたので進む</text>
+  <text class="base small" x="405" y="548" text-anchor="middle">理由は未確認</text>
+  <line x1="530" y1="525" x2="1035" y2="525" stroke="#d9994f" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <g fill="#fff" stroke="#d9994f" stroke-width="3">
+    <circle cx="650" cy="525" r="28"/>
+    <circle cx="765" cy="525" r="38"/>
+    <circle cx="900" cy="525" r="50"/>
+  </g>
+  <text class="base box-title" x="650" y="533" text-anchor="middle">?</text>
+  <text class="base box-title" x="765" y="533" text-anchor="middle">??</text>
+  <text class="base box-title" x="900" y="533" text-anchor="middle">???</text>
+  <text class="base small" x="775" y="604" text-anchor="middle">未理解の部分が増える</text>
+
+  <rect x="1060" y="468" width="270" height="114" rx="16" fill="#ffd9ae"/>
+  <text class="base box-title" x="1195" y="514" text-anchor="middle">調査からやり直し</text>
+  <text class="base small" x="1195" y="548" text-anchor="middle">障害対応中だとつらい</text>
+
+  <rect x="175" y="675" width="1090" height="58" rx="18" fill="#eef0f1"/>
+  <text class="base conclusion" x="720" y="714" text-anchor="middle">「読みやすいコード」と「理解しているコード」は別の話</text>
+</svg>
