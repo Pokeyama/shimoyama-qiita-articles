@@ -11,6 +11,8 @@ id: 16a1d3c518ae5fdf8a62
 organization_url_name: null
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 「AIに実装してもらう」前提で、Spec駆動開発を1本通しでやってみました。

@@ -12,6 +12,8 @@ id: c41e40daf888e06010a2
 organization_url_name: null
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 2年前に、音声ファイルから議事録を生成するツールを作りました。

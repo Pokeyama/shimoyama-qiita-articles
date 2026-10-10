@@ -10,6 +10,8 @@ id: af1e86d5a35b8df36a49
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 直近の案件では、状態を持つ型をイミュータブルに保つ方針で書いています。

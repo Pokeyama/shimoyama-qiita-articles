@@ -9,6 +9,8 @@ id: 2c8facc210743db60914
 organization_url_name: null
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 参照渡し自体は何も悪くなく、**副作用を理解して使っているか**という観点の記事になります。
