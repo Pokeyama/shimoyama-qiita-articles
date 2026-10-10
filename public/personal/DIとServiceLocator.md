@@ -11,6 +11,8 @@ id: f94f738d933a143f470e
 organization_url_name: null
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 大規模案件（API数100個超、テーブル数500個弱）のサーバーサイドプログラムをDIコンテナを使って実装しました。

@@ -10,6 +10,8 @@ id: 2ff77834d7cec372498d
 organization_url_name: null
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 
 # 環境

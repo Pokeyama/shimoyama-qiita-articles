@@ -11,6 +11,8 @@ id: 3acdf6d66d04086feeae
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 弊社の一部案件がGitHubへ移行したのでPR開発を取り入れてみました。
