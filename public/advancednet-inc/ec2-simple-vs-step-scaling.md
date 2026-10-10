@@ -124,6 +124,9 @@ https://docs.aws.amazon.com/ja_jp/autoscaling/ec2/userguide/as-scaling-simple-st
 1. ウォームアップ中にCPU85%でアラーム → +2の範囲だけど、すでに1台増えているので12台
 
 同じステップの範囲でアラームが続いても台数はどんどん増えなくて、大きいステップに入ったときだけ差分が足されます。
+図にすると以下のような感じです。
+
+![warmup-timeline.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/19542156-5a0a-4d39-917e-6d68f95431ea.png)
 
 あとはウォームアップが終わるまで、スケーリングポリシーによるスケールインが全部止まります。
 なのでスケールアウト直後の揺り戻しはステップでも防げます。
@@ -132,8 +135,11 @@ https://docs.aws.amazon.com/ja_jp/autoscaling/ec2/userguide/as-scaling-simple-st
 ウォームアップはポリシーの`estimated_instance_warmup`より、ASG側の`default_instance_warmup`で設定するのが推奨されています。
 どちらも設定していないと、ASGのデフォルトクールダウンの値が使われます。
 
-terraformで書くと以下のような感じです。
 `step_adjustment`の上限・下限はアラームの閾値からの差分で書きます。（コンソールだと絶対値）
+
+![step-adjustment.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/2462d351-a3f9-4630-b298-2a8909d3cd2c.png)
+
+terraformで書くと以下のような感じです。
 
 ```terraform:terraform
 resource "aws_autoscaling_group" "example" {
