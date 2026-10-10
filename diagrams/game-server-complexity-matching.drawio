@@ -1,0 +1,106 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram name="マッチング" id="matching">
+    <mxGraphModel dx="900" dy="500" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="330" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="head" value="待たせるほど、サーバーは探すレート帯を広げていく" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=13;fontStyle=1;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="25" y="14" width="800" height="22" as="geometry" />
+        </mxCell>
+
+        <mxCell id="phone" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9E9E9E;strokeWidth=1.5;" vertex="1" parent="1">
+          <mxGeometry x="25" y="96" width="180" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="pt" value="経過 0:45" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontColor=#9E9E9E;" vertex="1" parent="phone">
+          <mxGeometry x="0" y="12" width="180" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="pm" value="対戦相手を&lt;br&gt;探しています" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=13;" vertex="1" parent="phone">
+          <mxGeometry x="10" y="50" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pcap" value="画面はこれだけ。&lt;br&gt;条件が緩んだことは何も出ない。" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;fontSize=11;fontColor=#9E9E9E;" vertex="1" parent="1">
+          <mxGeometry x="15" y="224" width="200" height="34" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mk" value="1500（自分のレート）" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontColor=#757575;" vertex="1" parent="1">
+          <mxGeometry x="440" y="52" width="160" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="guide" value="" style="endArrow=none;dashed=1;dashPattern=3 3;html=1;strokeColor=#BDBDBD;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="520" y="74" as="sourcePoint" />
+            <mxPoint x="520" y="262" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="axis" value="" style="endArrow=none;html=1;strokeColor=#BDBDBD;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="310" y="86" as="sourcePoint" />
+            <mxPoint x="730" y="86" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="axL" value="レートが低い" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontColor=#BDBDBD;" vertex="1" parent="1">
+          <mxGeometry x="310" y="66" width="80" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="axR" value="レートが高い" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;fontSize=10;fontColor=#BDBDBD;" vertex="1" parent="1">
+          <mxGeometry x="650" y="66" width="80" height="16" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r1t" value="0〜10秒" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;fontSize=12;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="215" y="100" width="80" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="r1b" value="" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fillColor=#9673A6;strokeColor=none;opacity=75;" vertex="1" parent="1">
+          <mxGeometry x="478" y="100" width="84" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="r1l" value="±100" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="742" y="100" width="100" height="18" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r2t" value="10〜20秒" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;fontSize=12;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="215" y="140" width="80" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="r2b" value="" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fillColor=#9673A6;strokeColor=none;opacity=75;" vertex="1" parent="1">
+          <mxGeometry x="436" y="140" width="168" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="r2l" value="±200" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="742" y="140" width="100" height="18" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r3t" value="20〜40秒" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;fontSize=12;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="215" y="180" width="80" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="r3b" value="" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fillColor=#9673A6;strokeColor=none;opacity=75;" vertex="1" parent="1">
+          <mxGeometry x="352" y="180" width="336" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="r3l" value="±400" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="742" y="180" width="100" height="18" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r4t" value="40秒〜" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;fontSize=12;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="215" y="220" width="80" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="r4b" value="" style="rounded=1;arcSize=40;whiteSpace=wrap;html=1;fillColor=#9673A6;strokeColor=none;opacity=45;" vertex="1" parent="1">
+          <mxGeometry x="310" y="220" width="420" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="r4a1" value="" style="endArrow=blockThin;endFill=1;html=1;strokeColor=#9673A6;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="312" y="229" as="sourcePoint" />
+            <mxPoint x="292" y="229" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r4a2" value="" style="endArrow=blockThin;endFill=1;html=1;strokeColor=#9673A6;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="728" y="229" as="sourcePoint" />
+            <mxPoint x="748" y="229" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r4l" value="制限なし / CPU戦" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="756" y="220" width="100" height="18" as="geometry" />
+        </mxCell>
+
+        <mxCell id="cap" value="0件で終われないので、最後は釣り合いを捨てて成立させにいく。" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontColor=#616161;" vertex="1" parent="1">
+          <mxGeometry x="25" y="280" width="800" height="20" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
