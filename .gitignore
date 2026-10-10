@@ -6,6 +6,7 @@ php/.env
 .env
 yarn.lock
 .vscode
+.idea
 .claude
 diagrams
 audio
