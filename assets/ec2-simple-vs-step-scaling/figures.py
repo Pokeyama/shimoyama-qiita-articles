@@ -136,6 +136,56 @@ def step_adjustment():
     plt.close(fig)
 
 
+def scale_in_compare():
+    # 2分でスケールインのアラーム。-1のあと終了処理に約1分かかり、終わってから次の評価で-1
+    t = list(range(23))
+    step = [14] * 2 + [13] * 2 + [12] * 2 + [11] * 2 + [10] * 15
+    # シンプルは終了後にクールダウン300秒待つので6分おき
+    simple = [14] * 2 + [13] * 6 + [12] * 6 + [11] * 6 + [10] * 3
+
+    fig, ax = plt.subplots(figsize=(8, 4.2), dpi=200)
+    fig.subplots_adjust(left=0.09, right=0.84, top=0.78, bottom=0.14)
+    fig.text(0.09, 0.93, "スケールインの台数の変化（イメージ）", fontsize=13, weight="bold", color=INK)
+    fig.text(0.09, 0.87, "アウトはどちらもステップ　14台・最小10台　-1ずつ　クールダウン300秒　終了処理は約1分と仮定",
+             fontsize=9, color=INK2)
+    fig.text(0.09, 0.835, "負荷が下がりきって、最小台数までスケールインのアラームが続くケース", fontsize=9, color=INK2)
+
+    for y in (10, 11, 12, 13, 14):
+        ax.axhline(y, color=GRID, lw=1, zorder=0)
+    ax.axvline(2, color=MUTED, lw=1, ls=(0, (3, 3)), zorder=0)
+    ax.text(2.2, 14.25, "スケールインのアラームがALARM", fontsize=9, color=INK2)
+
+    # 2分〜4分は同じ台数なので、少しずらして両方見えるようにする
+    ax.step(t, [v + 0.05 for v in simple], where="post", color=ORANGE, lw=2)
+    ax.step(t, [v - 0.05 for v in step], where="post", color=SURFACE, lw=5)
+    ax.step(t, [v - 0.05 for v in step], where="post", color=BLUE, lw=2)
+    ax.plot(8, 9.95, "o", ms=8, color=BLUE, mec=SURFACE, mew=2, zorder=3)
+    ax.plot(20, 10.05, "o", ms=8, color=ORANGE, mec=SURFACE, mew=2, zorder=3)
+
+    ax.annotate("6分で最小台数", (8, 10), (8.6, 10.3), fontsize=9, color=INK)
+    ax.annotate("18分で最小台数", (20, 10), (16.0, 10.3), fontsize=9, color=INK)
+    ax.text(2.3, 10.45, "終了が終わったら\n次の-1", fontsize=9, color=INK, linespacing=1.3)
+    ax.annotate("終了後、クールダウン300秒は\n次のアラームに反応しない", (10, 12), (10.6, 12.35), fontsize=9,
+                color=INK, linespacing=1.3, arrowprops=dict(arrowstyle="-", color=MUTED, lw=1))
+
+    ax.text(22.6, 11.15, "インも\nステップ", fontsize=9, color=INK2, va="center", linespacing=1.3)
+    ax.text(22.6, 12.55, "インは\nシンプル", fontsize=9, color=INK2, va="center", linespacing=1.3)
+    ax.plot([22.2, 22.5], [11.15, 11.15], color=BLUE, lw=2, clip_on=False)
+    ax.plot([22.2, 22.5], [12.55, 12.55], color=ORANGE, lw=2, clip_on=False)
+
+    ax.set_xlim(0, 22)
+    ax.set_xticks(range(0, 23, 2))
+    ax.set_ylim(9.5, 14.6)
+    ax.set_yticks([10, 11, 12, 13, 14])
+    ax.set_xlabel("経過時間（分）", color=INK2)
+    ax.set_ylabel("台数", color=INK2)
+    clean(ax)
+
+    fig.savefig(OUT / "scale-in-compare.png", facecolor=SURFACE)
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     warmup_timeline()
     step_adjustment()
+    scale_in_compare()
