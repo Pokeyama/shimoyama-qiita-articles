@@ -79,8 +79,12 @@ ECSのサービスのスケーリング（Application Auto Scaling）はステ�
 
 https://docs.aws.amazon.com/ja_jp/autoscaling/application/userguide/step-scaling-policy-overview.html
 
+## クールダウンとウォームアップの違い
+じゃあEC2のステップは何でスケーリングしすぎるのを防いでいるのかというと、ウォームアップです。
+シンプルのクールダウンと比べながら、それぞれ細かく見ていきます。
+
 ### クールダウン時間（cooldown）
-スケールアウト／スケールインが終わってから、次のスケーリングを始めるまで待つ時間です。
+シンプルのところで書いた待ち時間ですが、ポイントは止まる範囲です。
 止まるのはそのポリシーだけではなく、グループ内の**シンプルスケーリングのポリシー全部**です。
 
 https://docs.aws.amazon.com/ja_jp/autoscaling/ec2/userguide/ec2-auto-scaling-scaling-cooldowns.html
