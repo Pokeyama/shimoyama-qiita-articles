@@ -10,6 +10,8 @@ id: b45573959a34f5e9df82
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
+posting_campaign_uuid: 3af9413ea59cb9f9b1d8
+agreed_posting_campaign_term: true
 ---
 # はじめに
 
