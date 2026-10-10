@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="720" viewBox="0 0 1440 720" role="img" aria-labelledby="title desc">
+  <title id="title">AI導入前後で開発のボトルネックが移動した図</title>
+  <desc id="desc">AI導入後は実装が短くなり、設計、理解、レビューが占める割合が増えたという体感を示す</desc>
+  <defs>
+    <style>
+      .base { font-family: "Hiragino Sans", "Yu Gothic", sans-serif; fill: #24272b; }
+      .title { font-size: 44px; font-weight: 700; }
+      .sub { font-size: 22px; fill: #687078; }
+      .row { font-size: 27px; font-weight: 700; }
+      .bar { font-size: 24px; font-weight: 700; }
+      .note { font-size: 22px; font-weight: 700; }
+      .conclusion { font-size: 28px; font-weight: 700; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#687078"/>
+    </marker>
+  </defs>
+
+  <rect width="1440" height="720" rx="28" fill="#fbfbf8"/>
+  <text class="base title" x="72" y="78">コードを書く速度が上がって、ボトルネックが移動した</text>
+  <text class="base sub" x="72" y="118">厳密な計測ではなく、自分の仕事時間のイメージ</text>
+
+  <text class="base row" x="82" y="235">AI導入前</text>
+  <g transform="translate(300 170)">
+    <rect width="230" height="110" rx="18" fill="#ccebbf"/>
+    <rect x="230" width="570" height="110" fill="#34383e"/>
+    <rect x="800" width="260" height="110" rx="18" fill="#ffd174"/>
+    <path d="M230 0v110M800 0v110" stroke="#fbfbf8" stroke-width="5"/>
+    <text class="base bar" x="115" y="66" text-anchor="middle" fill="#24532b">設計・調査</text>
+    <text class="bar" x="515" y="66" text-anchor="middle" fill="#fff">実装</text>
+    <text class="base bar" x="930" y="66" text-anchor="middle">レビュー</text>
+  </g>
+
+  <line x1="830" y1="300" x2="830" y2="346" stroke="#687078" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect x="760" y="303" width="140" height="40" rx="20" fill="#fbfbf8"/>
+  <text class="base note" x="830" y="331" text-anchor="middle">実装が短縮</text>
+
+  <text class="base row" x="82" y="430">AI導入後</text>
+  <g transform="translate(300 365)">
+    <rect width="330" height="110" rx="18" fill="#ccebbf"/>
+    <rect x="330" width="130" height="110" fill="#34383e"/>
+    <rect x="460" width="600" height="110" rx="18" fill="#ffbc5b"/>
+    <path d="M330 0v110M460 0v110" stroke="#fbfbf8" stroke-width="5"/>
+    <text class="base bar" x="165" y="66" text-anchor="middle" fill="#24532b">設計・調査</text>
+    <text class="bar" x="395" y="66" text-anchor="middle" fill="#fff">実装</text>
+    <text class="base bar" x="760" y="66" text-anchor="middle">理解・レビュー</text>
+  </g>
+
+  <rect x="72" y="560" width="1296" height="104" rx="20" fill="#edf4e9" stroke="#b8d8ad" stroke-width="2"/>
+  <circle cx="121" cy="612" r="22" fill="#55a844"/>
+  <path d="M111 612l7 7 14-17" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text class="base conclusion" x="166" y="622">コードを書く時間が減っても、理解と判断の時間は減らなかった</text>
+</svg>

@@ -1,0 +1,20 @@
+shimoyama@nxbt:~ $ history
+    1  sudo apt update && sudo apt full-upgrade -y
+    2  sudo apt install -y python3-pip vim tmux
+    3  sudo apt purge -y bluez
+    4  sudo rm -f /etc/bluetooth/main.conf
+    5  sudo rm -f /etc/systemd/system/bluetooth.service.d/override.conf
+    6  sudo apt install -y bluez
+    7  sudo vim /etc/bluetooth/main.conf
+    8  sudo systemctl daemon-reload
+    9  sudo systemctl restart bluetooth
+   10  sudo pip3 install --upgrade nxbt
+   11  sudo pip3 uninstall -y Flask Jinja2 itsdangerous Werkzeug
+   12  sudo pip3 install   Flask==2.0.3   Jinja2==3.0.3   itsdangerous==2.0.1   Werkzeug==2.0.3
+   13  sudo nxbt webapp --port 8080
+   14  sudo nxbt webapp
+   15  sudo nxbt demo
+   16  vim bp_auto.py
+   17  chmod +x bp_auto.py
+   18  sudo ./bp_auto.py
+   19  history
