@@ -11,6 +11,8 @@ id: 2623c18325968ebe2bbd
 organization_url_name: null
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # 1. はじめに
 qiita-cliというQiitaの記事をGithub上で管理投稿できるライブラリが公式から用意されています。

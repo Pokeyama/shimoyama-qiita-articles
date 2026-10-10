@@ -9,6 +9,8 @@ id: 62c3f7e5ff78b3156af5
 organization_url_name: null
 slide: false
 ignorePublish: false
+posting_campaign_uuid: null
+agreed_posting_campaign_term: false
 ---
 # はじめに
 ユニクロのバラエティゾーンで売ってるプログラムが書かれたTシャツありますよね。
