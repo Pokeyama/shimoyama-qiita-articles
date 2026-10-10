@@ -1,0 +1,6 @@
+# stateにはアカウントIDやARNが入るのでコミットしない
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars

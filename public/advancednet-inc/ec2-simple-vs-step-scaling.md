@@ -29,7 +29,7 @@ agreed_posting_campaign_term: false
 例えばCPU使用率が70%を超えたら+1、60%を下回ったら-1のように2つ作ります。
 条件を満たしたら必ず同じ数だけ増減するので、設計が簡単です。
 
-<!-- 画像: シンプルスケーリングポリシーの設定画面 -->
+![simple-scaling-policy.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/80801105-5763-4266-8b51-cec3336be938.png)
 
 ### クールダウン
 インスタンスの追加・削除が終わったあと、指定した秒数だけ次のスケーリングを待ちます。
@@ -53,7 +53,7 @@ https://docs.aws.amazon.com/ja_jp/autoscaling/ec2/userguide/simple-scaling-polic
 例えばCPU使用率が60〜80%なら+1、80〜90%なら+2、90%以上なら+4のように設定できます。
 負荷がわずかに超えた場合は少しだけ、急激に超えた場合は一気にスケールアウト、という使い分けができる。
 
-<!-- 画像: ステップスケーリングポリシーの設定画面 -->
+![step-scaling-policy.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/9f633883-0fb1-4961-89c4-828e21b4f8fb.png)
 
 シンプルと違ってスケーリング中もアラームに反応してくれます。
 クールダウンはなく、代わりに新しく起動したインスタンスにウォームアップ時間があります。
