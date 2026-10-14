@@ -1,11 +1,11 @@
 ---
 title: 【EC2】シンプルスケーリングとステップスケーリングの違い
 tags:
-  - 'AWS'
-  - 'EC2'
+  - AWS
+  - EC2
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-10-14T11:23:13+09:00'
+id: f1ff58b8503258fd16c0
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
