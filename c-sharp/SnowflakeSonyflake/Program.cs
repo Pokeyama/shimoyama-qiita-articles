@@ -3,7 +3,14 @@ const long TwEpoch = 1288834974657L; // 2010-11-04 01:42:54.657 UTC
 var tw = DateTimeOffset.FromUnixTimeMilliseconds(TwEpoch);
 
 Console.WriteLine("== 1bit左にずらすと2倍");
-Console.WriteLine($"5 = {Convert.ToString(5, 2)}, 5 << 1 = {Convert.ToString(5 << 1, 2)} ({5 << 1}), 5 << 3 = {5 << 3}");
+Console.WriteLine(5);
+Console.WriteLine(5 << 1);
+Console.WriteLine(5 << 2);
+Console.WriteLine(5 << 3);
+Console.WriteLine(Convert.ToString(5, 2));
+Console.WriteLine(Convert.ToString(5 << 1, 2));
+Console.WriteLine(Convert.ToString(5 << 2, 2));
+Console.WriteLine(Convert.ToString(5 << 3, 2));
 
 Console.WriteLine("== Snowflake 組み立て");
 var now = DateTimeOffset.Parse("2026-10-31T12:00:00Z");
