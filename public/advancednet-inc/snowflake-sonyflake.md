@@ -1,5 +1,5 @@
 ---
-title: 【ID採番】いい加減説明できるようにしたいSnowflakeとSonyflake
+title: SnowflakeとSonyflake
 tags:
   - C#
   - Snowflake
@@ -22,7 +22,7 @@ macOS
 .NET 10.0.8
 
 # Snowflakeとは
-2010年6月にTwitterのエンジニアリングブログで「Announcing Snowflake」として発表された由緒正しいパッケージです。
+2010年6月にTwitterのエンジニアリングブログで「Announcing Snowflake」として発表された由緒正しい仕組みです。
 開発目的はツイートのIDを作るための仕組みとのことです。
 
 https://blog.x.com/engineering/en_us/a/2010/announcing-snowflake
@@ -196,7 +196,7 @@ id            = 96902515261901317
 取り出し: elapsed=5775840000 seq=7 machine=2565
 ```
 
-マシンIDの2565は、IPの下位16bitが`10.5`のとき（10×256+5）の値です。
+マシンIDの2565がどこから来るかは、後のマシンIDの決め方で書きます。
 
 起点はv1が2014年、v2が2025年なので、v2の値を使っています。
 時刻の単位が10msなので、経過した数も10ms単位になります。
@@ -265,7 +265,7 @@ Sonyflakeは例外にしないで、前回の時刻のままシーケンスを�
 
 マシンIDが重複するのは配る側の問題です。
 SnowflakeはワーカーIDを設定で渡して、かぶっていないかは起動時にZooKeeperで確かめていました。
-Sonyflakeは、IPの前提に頼るか、`CheckMachineID`という用意されているフィールドの自前のチェックを書くことになります。
+Sonyflakeは、IPの前提に頼るか、`CheckMachineID`という用意されているフィールドに自前のチェックを書くことになります。
 
 ```go
 type Settings struct {
@@ -274,7 +274,10 @@ type Settings struct {
         CheckMachineID func(int) bool
 }
 ```
-# 使い所
+
+`MachineID`に関数を入れれば、IPを使わずに自分で配ることもできます。
+
+# 使いどころ
 共通しているのは、DBの連番に聞きに行かずに各サーバーでIDを作りたい、時刻順に並ぶ64bit整数が欲しいときです。
 
 Snowflakeは、台数が少なくて番号を固定で配れるなら素直に使えそうです。1台あたりの生成数も多いので。
@@ -284,7 +287,7 @@ Sonyflakeは台数が多くてIPからマシンIDを自動で決めたいとき�
 
 # まとめ
 ビット演算ってたまにやると頭が混乱する。
-ID採番の銀の弾丸っぽく使われてますが、マシンIDの決め方が難しいので万能というわけではなさそうです。。
+ID採番の銀の弾丸っぽく使われてますが、マシンIDの決め方が難しいので万能というわけではなさそうです。
 
 # 参考
 https://blog.x.com/engineering/en_us/a/2010/announcing-snowflake
