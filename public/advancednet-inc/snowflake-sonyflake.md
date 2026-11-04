@@ -5,8 +5,8 @@ tags:
   - Snowflake
   - Sonyflake
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-11-04T17:58:58+09:00'
+id: b27f57c46995c1b6df9a
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
