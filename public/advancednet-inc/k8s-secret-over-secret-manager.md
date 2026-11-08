@@ -1,5 +1,5 @@
 ---
-title: 【GKE】DBのパスワードをSecret ManagerではなくkubernetesのSecretで渡す
+title: DBのパスワードをSecret Managerではなくkubernetesで渡す
 tags:
   - kubernetes
   - GKE
@@ -85,14 +85,13 @@ Secret Managerは無料枠もあるので、パスワード数個なら料金は
 
 https://cloud.google.com/secret-manager/pricing?hl=ja
 
-よく「kubernetesのSecretはbase64にしてるだけで暗号化されていない」と言われます。
-kubernetesの公式ドキュメントにも、デフォルトではetcdに暗号化されずに保存されると書かれています。
+Secretの値はbase64なだけで、kubernetesの公式ドキュメントにも、デフォルトではetcdに暗号化されずに保存されると書かれています。
 
 > KubernetesのSecretは、デフォルトでは、APIサーバーの基礎となるデータストア(etcd)に暗号化されずに保存されます。
 
 https://kubernetes.io/ja/docs/concepts/configuration/secret/
 
-etcdの話とは別に、kubectlで読める人には値は見えます。
+kubectlで読める人には値が見えます。
 検証用クラスタで`kubectl get secret -o yaml`すると以下のようになっていました。
 
 ```
@@ -138,24 +137,8 @@ Secretの値を環境変数にする方法は2つあります。
                 name: api-secrets
 ```
 
-1行で済むので楽。
-
-ですが、Secretを作るときにキー名を打ち間違えたり、1つ入れ忘れたりしても、その環境変数が無いだけでPodは起動します。
-アプリ側で環境変数が無いときにエラーにしていないと、パスワードが空のまま起動が進んでしまう。
-DBに繋ぎに行くまで気づけない。
-
-実際にenvFromで起動してみると、Secretにある2つだけが入ってRunningになりました。
-アプリが3つ目の`REPLICA_DB_PASSWORD`を期待している想定でしたが、無くても何も言われません。
-
-```
-$ kubectl exec envfrom-ok -n app-dev -- env | grep _DB_PASSWORD
-HISTORY_DB_PASSWORD=dummy-history
-MASTER_DB_PASSWORD=dummy-master
-```
-
-Secretの名前自体を`api-secret`と間違えた場合は、envFromでも`Error: secret "api-secret" not found`で止まりました。
-secretKeyRefも同じ文言です。
-**止まらないのは、Secretはあるのにキーが足りないときだけ**です。
+1行で済むので楽ですが、Secretを作るときにキー名を打ち間違えたり、1つ入れ忘れたりしても、その環境変数が無いだけでPodは起動します。
+アプリ側で環境変数が無いときにエラーにしていないと、パスワードが空のまま起動が進んで、DBに繋ぎに行くまで気づけません。
 
 なので`secretKeyRef`で1個ずつ書きます。
 
@@ -180,8 +163,23 @@ secretKeyRefも同じ文言です。
 
 https://kubernetes.io/ja/docs/concepts/configuration/secret/
 
-書く量は増えますが、入れ忘れがデプロイの時点で止まってくれるのでこちらにしました。
-止まったあとの様子も見ておきたかったので、動いているDeploymentに足してみました。
+書く量は増えますが、Secretの入れ忘れがデプロイの時点で止まってくれるというのがミソだと思います。
+
+実際にどこまで止まるのか、アプリが3つ目の`REPLICA_DB_PASSWORD`を期待している想定で、Secretには2つしか入れずに試しました。
+Secretの名前を`api-secret`、`api-key`と末尾の`s`を抜いて打ち間違えたパターンも見ています。
+
+| 渡し方 | 状況 | 結果 |
+| --- | --- | --- |
+| `envFrom` | Secretはあるがキーが足りない | `Running`で起動。足りない環境変数は無いだけ |
+| `envFrom` | Secretの名前が違う | `Error: secret "api-secret" not found`で止まる |
+| `secretKeyRef` | Secretにキーが無い | `CreateContainerConfigError` |
+| `secretKeyRef` | Secretの名前が違う | `Error: secret "api-secret" not found`で止まる |
+| volumeのマウント | Secretの名前が違う | `ContainerCreating`のまま止まる |
+
+止まらないのは、Secretはあるのにキーが足りないときの`envFrom`だけです。
+volumeは秘密鍵の節で試しました。
+
+止まったあとの様子は、動いているDeploymentで見ました。
 `maxSurge: 1`、`maxUnavailable: 0`、readinessProbeありで、RollingUpdateの設定は実際のAPIと同じです。
 `kubectl patch`で`REPLICA_DB_PASSWORD`の`secretKeyRef`を足して、Secretには入れませんでした。
 
@@ -193,44 +191,21 @@ api-59f97c566b-cwhdb   1/1     Running                      0          100s
 ```
 
 新しいPodは止まって、古いPodはRunningのままです。
-イベントは以下でした。
-
-```
-Type     Reason     Age               From     Message
-Warning  Failed     2s (x4 over 27s)  kubelet  Error: couldn't find key REPLICA_DB_PASSWORD in Secret app-dev/api-secrets
-```
-
-`kubectl rollout status`は待ち続けてタイムアウトします。
-
-```
-$ kubectl rollout status deployment/api -n app-dev --timeout=15s
-Waiting for deployment "api" rollout to finish: 1 old replicas are pending termination...
-error: timed out waiting for the condition
-```
+イベントには`Error: couldn't find key REPLICA_DB_PASSWORD in Secret app-dev/api-secrets`が出ていて、`kubectl rollout status`は待ち続けてタイムアウトします。
 
 `progressDeadlineSeconds`の既定は600秒なので、10分後に`ProgressDeadlineExceeded`になりました。
+自動で元には戻らず、古いPodが動き続けるだけです。
 
 ```
 $ kubectl rollout status deployment/api -n app-dev --timeout=5s
 error: deployment "api" exceeded its progress deadline
 ```
 
-自動で元に戻したりはしません。
-古いPodが動き続けるだけです。
-
-そのあと、Secretにキーを足してみます。
+Secretにキーを足してみると、applyし直さなくても13秒くらいで止まっていた同じPodが起動して、古いPodが消えました。
 
 ```
 $ kubectl patch secret api-secrets -n app-dev -p '{"stringData":{"REPLICA_DB_PASSWORD":"dummy-replica"}}'
 secret/api-secrets patched
-```
-
-applyし直さなくても、13秒くらいで止まっていた同じPodが起動して、古いPodが消えました。
-
-```
-$ kubectl get pods -n app-dev -l app=api
-NAME                   READY   STATUS    RESTARTS   AGE
-api-58f7b58bc5-6qdzd   1/1     Running   0          12m
 $ kubectl rollout status deployment/api -n app-dev --timeout=5s
 deployment "api" successfully rolled out
 ```
@@ -238,7 +213,6 @@ deployment "api" successfully rolled out
 Secretの作り忘れで止まっても、Secretに足せば直ります。
 
 ## パスワードを変えたらPodを作り直す
-Secretの値を変えたときも見ておきました。
 `MASTER_DB_PASSWORD`を`dummy-master`から`dummy-master-v2`に変えて、Secretの値とvolumeでマウントしたファイルを2秒おきに確認して、ファイルが変わった時点で環境変数も見ています。
 
 ```
@@ -292,18 +266,11 @@ dummy-private-key
 実体の権限は`644 root:root`で、コンテナ内の誰でも読めます。
 鍵なら`defaultMode`で絞るつもりです。（0400にすれば良さそうですが、まだ試してない）
 
-マウント先は読み取り専用の`tmpfs`で、ノードのディスクには書かれません。
+`mount`で見るとマウント先は読み取り専用の`tmpfs`だったので、ノードのディスクには書かれていないっぽいです。
 
 ハマりそうなのが、`secretName`を`api-key`と打ち間違えたときです。
-envのときの`CreateContainerConfigError`にはならず、`ContainerCreating`のまま止まります。
-
-```
-NAME                   READY   STATUS              RESTARTS   AGE
-volume-nosecret        0/1     ContainerCreating   0          17s
-```
-
-`get pods`だけだと起動中に見えます。
-理由はイベントのほうに出ていました。
+envのときの`CreateContainerConfigError`にはならず、`ContainerCreating`のまま止まる。
+`get pods`だけだと起動中に見えて、理由はイベントを見ないと分からない。
 
 ```
 Warning   FailedMount   pod/volume-nosecret   MountVolume.SetUp failed for volume "api-keys" : secret "api-key" not found
