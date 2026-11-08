@@ -1,5 +1,5 @@
 ---
-title: DBのパスワードをSecret Managerではなくkubernetesで渡す
+title: GKE環境で機密情報をSecret Managerではなくkubernetesで渡す
 tags:
   - kubernetes
   - GKE
@@ -15,28 +15,19 @@ posting_campaign_uuid: null
 agreed_posting_campaign_term: false
 ---
 # はじめに
-GKEで動かしているAPIサーバーの設定ファイルに、DBの接続情報がそのまま書かれてレポジトリに入っていました。
-このままだと本番の値もいずれ同じ場所に書くことになります。
-今後は秘密鍵も扱う予定なので、その前に値をレポジトリから外す仕組みを作ることにしました。
+昨今情報流出が止まらないですよね。
+もしレポジトリのソースコードが漏れたとき認証情報などのパスワードが平文で載っていると被害が甚大になります。
+コード上からそういった情報を一掃しようという記事になります。
 
 GCPなら真っ先にSecret Managerが候補に出てくると思いますが、今回はkubernetesのSecretを選んだので、その理由と構成をまとめます。
-
-実際の環境に入れる前に、検証用のGCPプロジェクトに一時的にGKE Autopilotのクラスタを作って挙動を試しました。
-記事中のコマンドの出力は、そのクラスタのものです。
-クラスタは45分ほどで消して、単価から計算した費用は15円くらいでした（請求額は見ていない）。
 
 # 環境
 GKE Autopilot 1.36.4-gke.2046003（検証用クラスタ）
 DB: MySQL
 
-# レポジトリから外すもの
-設定ファイルに書いてある接続情報のうち、外すのはMySQLのパスワード2つだけにしました。
-
-ホスト名やユーザー名は見られても困らないのでそのままです。
-
 # Secret Managerにしなかった理由
 ## GCP側の設定が要る
-GKEからSecret Managerを読む方法はいくつかありますが、公式のアドオンを使う場合はクラスタでアドオンを有効にして、kubernetesのServiceAccountに`roles/secretmanager.secretAccessor`を付与する必要があります。
+GKEからSecret Managerを読む方法はいくつかありますが、GKEの「Secret Managerアドオン」（Secret ManagerのシークレットをPodにファイルとしてマウントする機能）を使う場合は、クラスタでアドオンを有効にして、kubernetesのServiceAccountに`roles/secretmanager.secretAccessor`を付与する必要があります。
 ドキュメントの例はシークレットごとに付与する形でした。
 
 https://cloud.google.com/secret-manager/docs/secret-manager-managed-csi-component?hl=ja
@@ -48,9 +39,13 @@ kubernetesのSecretなら、デプロイ先のnamespaceにkubectlで作るだけ
 環境変数にはならないので、アプリ側でファイルを読む処理が要ります。
 kubernetesのSecretへ同期したい場合は別の機能を案内されていました。
 
+https://docs.cloud.google.com/secret-manager/docs/sync-k8-secrets?hl=ja
+
 環境変数で受け取るアプリなら、kubernetesのSecretを環境変数にするだけで済みます。
 
-検証用のプロジェクトならIAMを自分で触れるので、アドオンも試しました。
+アドオンでも試してみたのですが、IAMの設定がいるのでkubernetesを使用しているなら直接Secretを使用するのが素直かなと思います。
+
+### Tips: Secret Managerでマウントしてみる
 シークレットを1つ作ってSecretProviderClassとマウントするPodを用意し、IAMを付ける前に起動すると、Podは`ContainerCreating`のまま止まります。
 イベントのFailedMountは、末尾が以下のようになっていました。
 
@@ -58,13 +53,13 @@ kubernetesのSecretへ同期したい場合は別の機能を案内されてい�
 rpc error: code = PermissionDenied desc = Permission 'secretmanager.versions.access' denied on resource (or it may not exist).
 ```
 
-原因はGCP側のIAMです。
-シークレット単位で`roles/secretmanager.secretAccessor`を付けたら、Podを作り直さなくても2分ほどでマウントが通りました。
+原因は前述の通りGCP側のIAMでした。
+シークレット単位で`roles/secretmanager.secretAccessor`を付けたら、Podを作り直さなくても2分ほどでマウントされました。
 kubernetesのSecretなら、この手順自体が要りません。
 
 マウント先は`/etc/sm/db-password`というファイルで、環境変数にはなりません。
 
-```
+```console
 $ kubectl exec sm-check -n app-dev -- cat /etc/sm/db-password
 dummy-sm-password
 ```
@@ -92,9 +87,9 @@ Secretの値はbase64なだけで、kubernetesの公式ドキュメントにも�
 https://kubernetes.io/ja/docs/concepts/configuration/secret/
 
 kubectlで読める人には値が見えます。
-検証用クラスタで`kubectl get secret -o yaml`すると以下のようになっていました。
+`MASTER_DB_PASSWORD`に`dummy-master`を入れたSecret（`api-secrets`）を`kubectl get secret -o yaml`で見ると、以下のようになっていました。
 
-```
+```console
 $ kubectl get secret api-secrets -n app-dev -o yaml
 data:
   HISTORY_DB_PASSWORD: ZHVtbXktaGlzdG9yeQ==
@@ -102,21 +97,21 @@ data:
 ```
 
 `MASTER_DB_PASSWORD`の値を`base64 -d`に通すと`dummy-master`に戻りました。
-読める人には平文と同じです。
 
 GKEの場合は、Secretも含めて保存時にデフォルトで暗号化されています。
-Cloud KMSの鍵でもう一段暗号化するアプリケーションレイヤーの暗号化もありますが、クラスタ側の設定なので今回は触っていません。
-検証用クラスタの`databaseEncryption`も`state: DECRYPTED`でした。
-これはアプリケーションレイヤーの暗号化をしていないという意味で、保存時の暗号化が無いという意味ではありません。
 
 https://cloud.google.com/kubernetes-engine/docs/how-to/encrypting-secrets?hl=ja
 
+以下の場合はSecret Managerを使用することになりますね。
+- バージョニングをしたい
+- シークレット単位で読める人を絞りたい
+
 # 構成
-アプリはDBのパスワードを環境変数から読む前提です。
+アプリはDBのパスワードを環境変数から読むようにしています。
 
 ## Secretを作る
 Secretはnamespaceごとにkubectlで作ります。
-マニフェストに書くと値がレポジトリに入ってしまうので、ここだけ手作業です。
+マニフェストに書くと値がレポジトリに入ってしまうので、ここだけ手作業になります。
 
 ```sh
 $ kubectl create secret generic api-secrets -n app-dev \
@@ -137,10 +132,10 @@ Secretの値を環境変数にする方法は2つあります。
                 name: api-secrets
 ```
 
-1行で済むので楽ですが、Secretを作るときにキー名を打ち間違えたり、1つ入れ忘れたりしても、その環境変数が無いだけでPodは起動します。
+1行で済むので楽ですが、Secretはあるのに中のキーが足りないと、その環境変数が無いだけでPodは起動してしまいます。
 アプリ側で環境変数が無いときにエラーにしていないと、パスワードが空のまま起動が進んで、DBに繋ぎに行くまで気づけません。
 
-なので`secretKeyRef`で1個ずつ書きます。
+なので`secretKeyRef`で1個ずつ書くのがよさそうです。
 
 ```yaml:deployment.yaml
           env:
@@ -163,78 +158,83 @@ Secretの値を環境変数にする方法は2つあります。
 
 https://kubernetes.io/ja/docs/concepts/configuration/secret/
 
-書く量は増えますが、Secretの入れ忘れがデプロイの時点で止まってくれるというのがミソだと思います。
+書く量は増えますが、キーの入れ忘れがデプロイの時点で止まってくれるというのがミソだと思います。
 
-実際にどこまで止まるのか、アプリが3つ目の`REPLICA_DB_PASSWORD`を期待している想定で、Secretには2つしか入れずに試しました。
-Secretの名前を`api-secret`、`api-key`と末尾の`s`を抜いて打ち間違えたパターンも見ています。
+### どのパターンで止まるか
+実際にどこまで止まるのか、アプリが3つ目の`REPLICA_DB_PASSWORD`を期待している想定で、Secretには2つしか入れずに試してみました。
 
-| 渡し方 | 状況 | 結果 |
-| --- | --- | --- |
-| `envFrom` | Secretはあるがキーが足りない | `Running`で起動。足りない環境変数は無いだけ |
-| `envFrom` | Secretの名前が違う | `Error: secret "api-secret" not found`で止まる |
-| `secretKeyRef` | Secretにキーが無い | `CreateContainerConfigError` |
-| `secretKeyRef` | Secretの名前が違う | `Error: secret "api-secret" not found`で止まる |
-| volumeのマウント | Secretの名前が違う | `ContainerCreating`のまま止まる |
+- `envfrom-ok`: envFromで`api-secrets`を読む。`REPLICA_DB_PASSWORD`は入っていない
+- `envfrom-nosecret`: envFromで`api-secret`を読む（Secretの名前を`s`抜いて打ち間違えたパターン）
+- `keyref-nosecret`: secretKeyRefで`api-secret`を読む（Secretの名前を`s`抜いて打ち間違えたパターン）
 
-止まらないのは、Secretはあるのにキーが足りないときの`envFrom`だけです。
-volumeは秘密鍵の節で試しました。
-
-止まったあとの様子は、動いているDeploymentで見ました。
-`maxSurge: 1`、`maxUnavailable: 0`、readinessProbeありで、RollingUpdateの設定は実際のAPIと同じです。
-`kubectl patch`で`REPLICA_DB_PASSWORD`の`secretKeyRef`を足して、Secretには入れませんでした。
-
+```console
+$ kubectl get pods -n app-dev
+NAME                   READY   STATUS                       RESTARTS   AGE
+envfrom-nosecret       0/1     CreateContainerConfigError   0          13s
+envfrom-ok             1/1     Running                      0          13s
+keyref-nosecret        0/1     CreateContainerConfigError   0          12s
 ```
+
+```console
+$ kubectl get events -n app-dev --field-selector involvedObject.name=envfrom-nosecret
+LAST SEEN   TYPE      REASON      OBJECT                 MESSAGE
+12s         Warning   Failed      pod/envfrom-nosecret   Error: secret "api-secret" not found
+```
+
+`keyref-nosecret`のイベントも同じ`Error: secret "api-secret" not found`でした。
+
+止まらなかったのは`envfrom-ok`だけです。
+同じenvFromでも、Secretそのものが無い`envfrom-nosecret`は止まっていて、envFromが見逃すのはSecretの中のキーが足りないときだけでした。
+
+### デプロイ中に止まったらどうなるか
+動いているDeploymentに`kubectl patch`で`REPLICA_DB_PASSWORD`の`secretKeyRef`を足して、Secretには入れずに挙動を見てみました。
+変更前のPodが`api-59f97c566b-cwhdb`、変更後のPodが`api-58f7b58bc5-6qdzd`です。
+
+patchした直後です。
+
+```console
 $ kubectl get pods -n app-dev
 NAME                   READY   STATUS                       RESTARTS   AGE
 api-58f7b58bc5-6qdzd   0/1     CreateContainerConfigError   0          10s
 api-59f97c566b-cwhdb   1/1     Running                      0          100s
+$ kubectl rollout status deployment/api -n app-dev --timeout=15s
+Waiting for deployment "api" rollout to finish: 1 old replicas are pending termination...
+error: timed out waiting for the condition
 ```
 
-新しいPodは止まって、古いPodはRunningのままです。
+変更後のPodは止まって、変更前のPodはRunningのままです。
 イベントには`Error: couldn't find key REPLICA_DB_PASSWORD in Secret app-dev/api-secrets`が出ていて、`kubectl rollout status`は待ち続けてタイムアウトします。
 
 `progressDeadlineSeconds`の既定は600秒なので、10分後に`ProgressDeadlineExceeded`になりました。
-自動で元には戻らず、古いPodが動き続けるだけです。
+以下は10分後の出力です。
+Podの部分だけ載せています。
 
-```
+```console
+$ kubectl get deploy,rs,pods -n app-dev
+NAME                       READY   STATUS                       RESTARTS   AGE
+pod/api-58f7b58bc5-6qdzd   0/1     CreateContainerConfigError   0          10m
+pod/api-59f97c566b-cwhdb   1/1     Running                      0          11m
 $ kubectl rollout status deployment/api -n app-dev --timeout=5s
 error: deployment "api" exceeded its progress deadline
 ```
 
-Secretにキーを足してみると、applyし直さなくても13秒くらいで止まっていた同じPodが起動して、古いPodが消えました。
+自動で元には戻らず、変更前のPodが動き続けるだけです。
 
-```
+Secretにキーを足してみると、applyし直さなくても13秒くらいで、止まっていた変更後のPodがそのまま起動して、変更前のPodが消えました。
+頭がいい。
+
+```console
 $ kubectl patch secret api-secrets -n app-dev -p '{"stringData":{"REPLICA_DB_PASSWORD":"dummy-replica"}}'
 secret/api-secrets patched
+$ kubectl get pods -n app-dev -l app=api
+NAME                   READY   STATUS    RESTARTS   AGE
+api-58f7b58bc5-6qdzd   1/1     Running   0          12m
 $ kubectl rollout status deployment/api -n app-dev --timeout=5s
 deployment "api" successfully rolled out
 ```
 
-Secretの作り忘れで止まっても、Secretに足せば直ります。
-
-## パスワードを変えたらPodを作り直す
-`MASTER_DB_PASSWORD`を`dummy-master`から`dummy-master-v2`に変えて、Secretの値とvolumeでマウントしたファイルを2秒おきに確認して、ファイルが変わった時点で環境変数も見ています。
-
-```
-19:36:41 secret=dummy-master-v2
-19:37:47 file=dummy-master-v2
-== env at 19:37:47
-MASTER_DB_PASSWORD=dummy-master
-```
-
-ファイルは1分ちょっと後に新しい値になりましたが、環境変数は古いままです。
-環境変数はコンテナ起動時に渡されるだけなので、**パスワードを変えたらPodを作り直す必要があります**。
-値を変えたのは前の節でキーを足すより前だったので、キーを足したあとに起動したPodは新しい値を持っていました。
-
-```
-$ kubectl exec deploy/api -n app-dev -- env | grep _DB_PASSWORD
-HISTORY_DB_PASSWORD=dummy-history
-REPLICA_DB_PASSWORD=dummy-replica
-MASTER_DB_PASSWORD=dummy-master-v2
-```
-
-## 秘密鍵はファイルで渡す
-今後扱う秘密鍵は、Secretをファイルとしてマウントする予定です。
+## pemのような鍵ファイルはマウントして渡す
+pemのような鍵ファイルは、Secretをファイルとしてマウントできます。
 
 ```yaml:deployment.yaml
     spec:
@@ -250,10 +250,19 @@ MASTER_DB_PASSWORD=dummy-master-v2
             secretName: api-keys
 ```
 
-Secretのキーごとにファイルができるので、アプリはパスを読むだけです。
-本物の鍵はまだ来ていないので、検証はダミーの文字列でやりました。
+Secretのキーごとにファイルができるので、アプリはパスを読む必要があります。
+鍵ファイルは、ファイル名をキーの名前にしてSecretに入れておきます。
+検証ではダミーの文字列を`private.pem`というキーで入れました。
 
+```sh
+$ kubectl create secret generic api-keys -n app-dev \
+    --from-literal=private.pem='dummy-private-key'
+secret/api-keys created
 ```
+
+マウントすると、キーの`private.pem`が`/etc/api-keys/private.pem`というファイルになります。
+
+```console
 $ kubectl exec volume-ok -n app-dev -- ls -la /etc/api-keys
 drwxr-xr-x 2 root root   60 Nov  8 10:35 ..2026_11_08_10_35_13.2955777699
 lrwxrwxrwx 1 root root   32 Nov  8 10:35 ..data -> ..2026_11_08_10_35_13.2955777699
@@ -263,22 +272,45 @@ dummy-private-key
 ```
 
 `private.pem`は`..data`を経由したシンボリックリンクになっていました。
-実体の権限は`644 root:root`で、コンテナ内の誰でも読めます。
-鍵なら`defaultMode`で絞るつもりです。（0400にすれば良さそうですが、まだ試してない）
+実体の権限は`644 root:root`で、コンテナ内の誰でも読めそうです。
+
+```console
+$ kubectl exec volume-ok -n app-dev -- stat -L -c "%a %U:%G" /etc/api-keys/private.pem
+644 root:root
+```
 
 `mount`で見るとマウント先は読み取り専用の`tmpfs`だったので、ノードのディスクには書かれていないっぽいです。
 
-ハマりそうなのが、`secretName`を`api-key`と打ち間違えたときです。
-envのときの`CreateContainerConfigError`にはならず、`ContainerCreating`のまま止まる。
-`get pods`だけだと起動中に見えて、理由はイベントを見ないと分からない。
+```console
+$ kubectl exec volume-ok -n app-dev -- sh -c 'mount | grep api-'
+tmpfs on /etc/api-keys type tmpfs (ro,relatime,size=28926996k,noswap)
+tmpfs on /etc/api-secrets type tmpfs (ro,relatime,size=28926996k,noswap)
+```
+
+## パスワードを変えたらPodを作り直す
+同じSecretを環境変数とファイルの両方で渡したPodで、値を変えてみました。
+`MASTER_DB_PASSWORD`を`dummy-master`から`dummy-master-v2`に変えて、Secretの値とvolumeでマウントしたファイルを2秒おきに確認して、ファイルが変わった時点で環境変数も見ています。
 
 ```
-Warning   FailedMount   pod/volume-nosecret   MountVolume.SetUp failed for volume "api-keys" : secret "api-key" not found
+19:36:41 secret=dummy-master-v2
+19:37:47 file=dummy-master-v2
+== env at 19:37:47
+MASTER_DB_PASSWORD=dummy-master
+```
+
+ファイルは1分ちょっと後に新しい値になりましたが、環境変数は古いままでした。ん？
+環境変数はコンテナ起動時に渡されるだけなので、**パスワードを変えたらPodを作り直す必要があります**。
+
+起動し直したPodには新しい値が入ります。
+値を変えたのはデプロイ中に止まった話でキーを足すより前だったので、キーを足したあとに起動した`api`のPodには新しい値が入っていました。
+
+```console
+$ kubectl exec deploy/api -n app-dev -- env | grep _DB_PASSWORD
+HISTORY_DB_PASSWORD=dummy-history
+REPLICA_DB_PASSWORD=dummy-replica
+MASTER_DB_PASSWORD=dummy-master-v2
 ```
 
 # まとめ
-本番の値をレポジトリから外すのに、今回はkubernetesのSecretを使うことにしました。
-バージョンが残る分Secret Managerのほうが便利ですが、GCP側の設定を足さずにクラスタの中で済むほうを選んだ感じです。
-実際の環境への投入はこれからです。
-
-Secretを手で作る運用なので、どの環境に何を入れたかを別で残しておかないとそのうち事故りそうです。
+バージョンが残る分Secret Managerのほうが便利ですが、GCPの設定をおいそれといじれない環境にいるときもできますよーという記事でした。
+大AI時代で.envを普通にpushしちゃってるレポジトリも多々見られるので、最低限こういった設定はしておきたいですね。
