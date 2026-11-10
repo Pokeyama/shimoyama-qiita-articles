@@ -4,10 +4,10 @@ tags:
   - kubernetes
   - GKE
   - GoogleCloud
-  - SecretManager
+  - secretmanager
 private: false
-updated_at: ''
-id: null
+updated_at: '2026-11-10T11:34:14+09:00'
+id: 78bf559009a4be21ed2a
 organization_url_name: advancednet-inc
 slide: false
 ignorePublish: false
