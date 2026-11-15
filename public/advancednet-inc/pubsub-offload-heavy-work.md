@@ -3,8 +3,6 @@ title: Pub/Subで重い処理を非同期に逃がそう
 tags:
   - PubSub
   - GoogleCloud
-  - C#
-  - MySQL
 private: false
 updated_at: ''
 id: null
@@ -15,11 +13,8 @@ posting_campaign_uuid: null
 agreed_posting_campaign_term: false
 ---
 # はじめに
-APIの中で重い処理をすると、その分だけレスポンスが遅くなります。
-結果を待たなくていい処理なら、Pub/Subに投げて別のプログラムにやらせればAPIはすぐ返せます。
-この記事では、Pub/Subに処理を逃がす手順と、実際に動かして分かった受け手の書き方をまとめます。
-
-送り手と受け手はC#、DBはMySQLで、受け手はpullで受け取ります。
+業務でGCPによるPub/Subでのキューイング実装をすることになりそうなのでもろもろ検証して勉強してみました。
+AWSのSQS/SNSは使用したことあったのですが、こちらは使用したことなかったので。
 
 # 環境
 macOS 26.5.2
@@ -30,18 +25,50 @@ MySQL 8.4 (Docker)
 
 # Pub/Subとは
 GCPのメッセージングサービスです。
-送り手がトピックにメッセージをpublishすると、そのトピックにつながっているサブスクリプションごとに1通ずつ届きます。
+送信側と受信側の間にPub/Subを挟んで、データを受け渡します。
+Pub/Subという名前は、送信するpublishと、購読するsubscribeから来ています。
 
-受け手はサブスクリプションからメッセージを受け取って、処理が終わったらackを返します。
-ackが返ってくるまでメッセージは消えず、ack期限を過ぎると再送されます。
+![pubsub-basics.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/25c614b1-1231-4c6c-84e5-dd49c529f776.png)
+送るデータをメッセージ、送信するプログラムをパブリッシャーと呼びます。
 
-処理できなかったときはnackを返すと、ack期限を待たずに再送の対象になります。
+## メッセージが届くまで
 
-受け取り方は、受け手から取りに行くpullと、Pub/Subが受け手のURLを呼ぶpushの2つがあって、この記事はpullです。
+パブリッシャーは、トピック（送信先）にメッセージを送信（publish）します。
+メッセージは、トピックにつないだ各サブスクリプション（受信口）へ配られます。
+サブスクライバーが、そこからメッセージを受信して処理します。
 
-あと、**同じメッセージが2回届くことがあります。**
+この記事では、注文受付APIがパブリッシャー、注文処理のワーカーがサブスクライバーです。
 
-AWSで言うと以下です。
+サブスクリプションを注文処理用と通知用の2つ作れば、両方に同じ注文IDを届けることができます。
+
+https://docs.cloud.google.com/pubsub/docs/pubsub-basics?hl=ja
+
+## ackとnack
+ackは、ワーカーがPub/Subに返す処理完了の通知です。
+メッセージを受け取っただけでは処理済みにならず、処理が終わってからackを返します。
+
+ack期限は、Pub/Subがメッセージを届けてからackを待つ時間です。
+この期限までにackが返ってこないと、Pub/Subはメッセージを再送します。
+
+nackは、処理できなかったことを伝える通知です。
+nackを返すと、ack期限を待たずに再送の対象になります。
+実際に再送されるまでの待ち時間は、後述する再試行ポリシーにも影響されます。
+
+https://docs.cloud.google.com/pubsub/docs/subscription-overview?hl=ja
+
+## pullとpush
+自分のプログラムでメッセージを受け取る方法には、pullとpushがあります。
+pullはワーカーからPub/Subにメッセージを取りに行く方式で、pushはPub/SubがワーカーのURLにHTTPリクエストを送る方式です。
+pushでは`200`などのHTTP応答がackに相当し、エラー応答やタイムアウトで再送の対象になります。
+
+https://docs.cloud.google.com/pubsub/docs/push?hl=ja
+
+この記事はpullを使います。
+
+## AWSとの対応
+AWSにもSQS/SNSという似たようなサービスがあります。
+そちらを使ったことがある方はこの対応表でなんとなくわかるかなと思います。
+SNSからSQSに配信する構成で考えると、以下のような対応です。
 
 | Pub/Sub | AWS |
 | --- | --- |
@@ -52,17 +79,31 @@ AWSで言うと以下です。
 | dead letterトピック | SQSのデッドレターキュー |
 | 未ackのメッセージの保持期間 デフォルト7日・最長31日 | SQSのメッセージ保持期間 デフォルト4日・最長14日 |
 
+https://docs.cloud.google.com/pubsub/docs/dead-letter-topics?hl=ja
+
+https://docs.cloud.google.com/pubsub/docs/subscription-properties?hl=ja
+
 https://docs.aws.amazon.com/ja_jp/sns/latest/dg/sns-sqs-as-subscriber.html
 
 https://docs.aws.amazon.com/ja_jp/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
 
 # 構成
-<!-- 画像: API（送り手）→ Pub/Sub（トピック → サブスクリプション）→ 受け手 → MySQLの構成図。APIと受け手は同じMySQLを見る -->
+今回は、注文を受け付ける簡単な注文システムを想定して実際に構築してみます。
+注文をDBに保存して、その注文に対する重い処理をする、という流れです。
 
-APIは注文を受けたら、注文を`pending`で保存して、Pub/Subに注文IDをpublishしてすぐ返します。
+これをAPIの中で全部やると、呼び出した側は重い処理が終わるまで応答を待つことになります。
+APIでは注文の受付まで行って、重い処理はワーカーに任せます。
+APIとワーカーを別サーバーに分ければ、重い処理に使うCPUやメモリをAPI側から切り離せます。
 
-受け手は、メッセージの注文IDでDBを見て、重い処理をして`done`にします。
-受け手はPub/Subが動かしてくれるものではなく、自分で書いて動かすプログラムです。
+![order-flow.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/7af59719-d77f-4401-9ee7-de4dbbed6c7d.png)
+
+図はAPIとワーカーを別サーバーに分ける構成です。
+今回の動作確認では、同じMac上で別プロセスとして動かしています。
+
+APIは注文を受けたら、注文を`pending`（処理待ち）で保存して、Pub/Subに注文IDをpublishして受付結果を返します。
+この時点では、注文の処理はまだ終わっていません。
+
+ワーカーは、メッセージの注文IDでDBを見て、重い処理をして`done`（だん・処理完了）にします。
 
 テーブルは以下のような感じです。
 
@@ -70,15 +111,14 @@ APIは注文を受けたら、注文を`pending`で保存して、Pub/Subに注�
 CREATE TABLE orders (
   order_id BIGINT AUTO_INCREMENT PRIMARY KEY,
   status VARCHAR(16) NOT NULL,          -- 'pending' / 'done'
-  process_count INT NOT NULL DEFAULT 0, -- 二重処理の検出用
+  process_count INT NOT NULL DEFAULT 0, -- doneへの更新回数を確認するため
   created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   done_at DATETIME(3) NULL
 );
 ```
 
-重い処理は3秒待つだけにしています。
+重い処理は3秒待つようにして再現しています。
 
-比較用に、同じ重い処理をAPIの中でやる`/orders/sync`も作っておきます。
 
 # トピックとサブスクリプションを作る
 gcloudで作ります。
@@ -101,25 +141,28 @@ Created subscription [projects/<PROJECT>/subscriptions/pubsub-lab-orders-worker]
 
 https://docs.cloud.google.com/pubsub/docs/subscription-properties?hl=ja
 
-受け手がnackを返し続けると、すぐに再試行ではその間ずっと再送が回り続けます。
+処理できない状態ですぐに再送されると、同じ失敗を短い間隔で繰り返すことになります。
+再試行の間隔を徐々に空けるため、今回は最小遅延10秒・最大遅延600秒に設定しました。
 
-なので最短10秒・最長600秒にしています。
-
-実際にnackを返し続ける受け手を40分動かして、再送の間隔を見てみました。
+実際にnackを返し続けるワーカーを40分動かして、再送の間隔を見てみました。
 
 ```text
 14.6, 16.9, 20.0, 22.0, 23.0, 30.0, 37.1, 43.1, 79.0, 88.1, 126.1, 150.1, 159.2, 236.1, 263.3, 512.4, 567.6（秒）
 ```
 
 倍々ではなく、ばらつきながら伸びていきます。
-最短10秒の設定でも、2秒かからずに再送された回がありました。
+最小遅延10秒の設定でも、2秒かからずに再送された回がありました。
 
-# 送り手を書く
-`PublisherClient`は起動時に1回だけ作って、使い回します。
-エンドポイントは以下のようになります。
-実験用のスイッチとログは省いています。
+公式にも、nackが多い場合は待ち時間が短くなったり、待たずに再送されたりすることがあると書かれています。
+保証されないそうなので注意が必要ですね。
 
-```c#:Program.cs（送り手の抜粋）
+https://docs.cloud.google.com/pubsub/docs/subscription-retry-policy?hl=ja
+
+# APIを書く
+エンドポイントは以下のようにしてみました。
+検証用のスイッチとログは省いています。
+
+```c#:Program.cs（APIの抜粋）
 var publisher = await new PublisherClientBuilder
 {
     TopicName = TopicName.FromProjectTopic(project, "pubsub-lab-orders"),
@@ -129,7 +172,7 @@ app.MapPost("/orders/async", async () =>
 {
     await using var conn = new MySqlConnection(db);
     await conn.OpenAsync();
-    var tx = await conn.BeginTransactionAsync();
+    await using var tx = await conn.BeginTransactionAsync();
     var cmd = new MySqlCommand("INSERT INTO orders (status) VALUES ('pending')", conn, tx);
     await cmd.ExecuteNonQueryAsync();
     var id = cmd.LastInsertedId;
@@ -144,9 +187,11 @@ app.MapPost("/orders/async", async () =>
 保存してからpublishして、最後にコミットする順番です。
 
 Pub/Subへのpublishは、DBのトランザクションには入りません。
-なので「コミットしてからpublish」と「publishしてからコミット」のどちらかを選ぶことになります。
+**ここで重要なのが順番で、「コミットしてからpublish」と「publishしてからコミット」のどちらかを選ぶことになります**。
 
-## コミットしてからpublishすると取りこぼす
+## コミットしてからpublishすると取りこぼす可能性がある
+![commit-then-publish.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/7f77caaa-e543-4bb7-83a6-820878fd1fad.png)
+
 コミットとpublishの間でプロセスが落ちると、DBには保存されているのにメッセージが送られません。
 間でわざと落としてみると以下のようになりました。
 
@@ -156,25 +201,30 @@ Pub/Subへのpublishは、DBのトランザクションには入りません。
 22:02:47.533 crash after commit
 ```
 
-60秒待っても注文は`pending`のままで、受け手には1通も来ませんでした。
+60秒待っても注文は`pending`のままで、ワーカーには1通も来ませんでした。
 
 ## publishしてからコミットする
-逆の順番なら、publishが失敗すると例外でコミットまでたどり着かないので、保存されたのにメッセージが無い状態にはなりません。
+![publish-then-commit.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/b33a057a-56e9-4061-a5c6-b99e15984455.png)
 
-代わりに、メッセージだけ届いてDBには無い、という状態が起きます。
-これは受け手で吸収します。
+このコードでは、`PublishAsync`が成功してからコミットします。
+`PublishAsync`が例外になった場合はコミットせず、トランザクションの破棄時にロールバックされます。
 
-送るメッセージをいったんテーブルに書いて、別のプロセスがpublishするOutboxパターンというやり方もあります。
-今回は受け手が同じDBを見られるので、そこまではしていません。
+代わりに、メッセージだけ届いてDBには注文IDが無い、という状態が起きます。
+これはワーカーで吸収する必要があります。
 
-# 受け手を書く
-受け手は以下のルールで書きます。
+送るメッセージをいったんテーブルに書いて、別のプロセスがpublishするOutboxパターンというやり方もありますが本題とズレるので省略。
+
+# ワーカーを書く
+ワーカーは以下のルールで書きます。
 
 1. 注文が`pending` → 重い処理をして`done`にしてack
 1. 注文が`done` → 何もしないでack
 1. 注文が見つからない → 200ms待ってもう一度見る。それでも無ければnack
 
-```c#:Program.cs（受け手の抜粋）
+200ms待ってもう一度DBを見るのは、コミット待ちでnackになって再送を待つ回数を減らすためです。
+見直しても注文が無ければ、あとでコミットされる可能性があるのでnackにします。
+
+```c#:Program.cs（ワーカーの抜粋）
 var subscriber = await new SubscriberClientBuilder
 {
     SubscriptionName = SubscriptionName.FromProjectSubscription(project, "pubsub-lab-orders-worker"),
@@ -212,71 +262,19 @@ var run = subscriber.StartAsync(async (msg, ct) =>
 
 こちらも実験用のスイッチとログは省いています。
 
-`FlowControlSettings`の1は、同時に処理するメッセージの数です。
-同期版と比べるときに条件を揃えたいので1にしています。
+この`done`判定で処理を省略できるのは、完了後に同じ注文が届いた場合です。
+同じ注文を複数ワーカーが同時に処理する場合や、外部APIの呼び出し後に落ちた場合は、排他制御や注文IDによる処理先での重複防止も必要です。
+`process_count`はDBの更新回数なので、重い処理そのものの実行回数とはずれることがあります。
 
-## コミットより先に届く
-最初は見直しを入れず、見つからなければすぐnackにしていました。
-送り手と受け手のログを時刻順に並べると以下のようになっていました。
+https://docs.cloud.google.com/pubsub/docs/subscribe-best-practices?hl=ja
 
-```text
-22:09:25.364 [送り手] insert order=1
-22:09:25.539 [受け手] recv msgId=23441922620419938 order=1 publishTime=22:09:25.555
-22:09:25.544 [受け手] nack (row not found)
-22:09:25.548 [送り手] published order=1 msgId=23441922620419938
-22:09:25.553 [送り手] commit order=1
-```
-
-**送り手の`PublishAsync`が返るより先に、受け手が受け取っています。**
-
-コミットより先に届くのはたまにだと思っていたら、受け手が暇なときはだいたいこれでした。
-5件投げたら5件ともnackで、全部10秒くらい待たされていました。
-
-なので、見つからなかったら200msだけ待ってもう一度見るようにしています。
-コミットを0.1秒遅らせて試すと以下のようになりました。
-
-```text
-22:54:08.616 published order=1 msgId=22615536250928311
-22:54:08.623 recv msgId=22615536250928311 order=1 publishTime=22:54:08.614
-22:54:08.722 commit order=1
-22:54:08.876 recheck order=1 found=True
-22:54:11.884 update order=1 affected=1
-22:54:11.884 ack (processed)
-22:54:13.470 recv msgId=22615536250928311 order=1 publishTime=22:54:08.614
-22:54:13.476 ack (already done)
-```
-
-見直しで見つかって、nackせずに処理できています。
-
-そしてackしたのに同じメッセージがもう1回来てる。
-`done`なら何もしないでackするようにしているので、`process_count`は1のままです。
-
-コミットを1秒遅らせたときは、見直しでも見つからずにnackになって、再送で処理されました。
-見直しは保険で、間に合わなければ今まで通りnackに落ちます。
-
-## 見つからないときにackすると取りこぼす
-見つからないときにackしてしまうと、あとでコミットされた注文を取りこぼします。
-
-```text
-22:37:43.342 published order=1 msgId=23309967033347292
-22:37:43.905 recv msgId=23309967033347292 order=1 publishTime=22:37:43.336
-22:37:43.964 ack (row not found)
-22:37:48.351 commit order=1
-```
-
-65秒待っても注文は`pending`のままで、メッセージは二度と来ませんでした。
-
-なので見つからないときは必ずnack。
-
-ロールバックで本当に保存されなかった場合は、受け手がnackを返し続けることになります。
-コミットだけ失敗させてみると、11.5秒、15.0秒、15.0秒、25.0秒、27.0秒と間隔を伸ばしながらnackが続きました。
-
-保持期間の間はこのままなので、気になる場合はdead letterトピックで一定回数で逃がすことになります。
+ロールバックで注文が保存されなかった場合も、ワーカーはnackを返し続けます。
+処理できないメッセージの転送先として、dead letterトピックを設定できます。
 
 https://docs.cloud.google.com/pubsub/docs/dead-letter-topics?hl=ja
 
 ## ackする前に落ちたとき
-重い処理が終わってDBを`done`にしたあと、ackを返す前に受け手を落としてみました。
+重い処理が終わってDBを`done`にしたあと、ackを返す前にワーカーを落としてみました。
 
 ```text
 22:15:41.789 update order=1 affected=1
@@ -285,55 +283,66 @@ https://docs.cloud.google.com/pubsub/docs/dead-letter-topics?hl=ja
 22:16:50.853 ack (already done)
 ```
 
-再起動した受け手に同じメッセージが届いて、`done`なので何もせずackしています。
+再起動したワーカーに同じメッセージが届いて、`done`なので何もせずackしています。
 `process_count`は1のままでした。
-状態を見ずに毎回処理する受け手で同じことをすると、`process_count`が2になりました。
+状態を見ずに毎回処理するワーカーで同じことをすると、`process_count`が2になりました。
 
-再送まで69秒かかっているのは、C#のライブラリがack期限を自分で延ばしているからです。
+再送は、ワーカーを落としてから約69秒後でした。
 
-起動時に`SubscriberClient.DefaultAckDeadline`を出してみると`00:01:00`で、ライブラリ側のack期限は60秒でした。
-受け手が処理している間は、期限が来る前にライブラリが延長してくれます。
+C#の`SubscriberClient`は、メッセージの処理を始める前に`HandleExtendLease`を呼んでいます。
 
-> デフォルトでは、クライアント ライブラリは定期的な modifyAckDeadline リクエストを発行することで期限を 1 時間延長できます。
+```c#:SubscriberClientImpl.SingleChannel.cs
+HandleExtendLease(msgIds, null);
+Task messagesTask = _taskHelper.Run(
+    () => ProcessPullMessagesAsync(msgs, msgIds));
+```
 
-https://docs.cloud.google.com/pubsub/docs/lease-management?hl=ja
+https://github.com/googleapis/google-cloud-dotnet/blob/76d4c27ae2cfece6774bdebfaf2f944b9c2847e7/apis/Google.Cloud.PubSub.V1/Google.Cloud.PubSub.V1/SubscriberClientImpl.SingleChannel.cs#L501-L509
 
-ハンドラから戻らないまま3分待っても、再送はされませんでした。
-サブスクリプションのack期限は10秒にしていますが、受け手が生きている間は関係ないです。
+期限を延長するときは、以下のようにSDKから`ModifyAckDeadlineAsync`を呼びます。
+
+```c#:SubscriberClientImpl.SingleChannel.cs
+Task extendTask = _client.ModifyAckDeadlineAsync(
+    _subscriptionName,
+    extends.Select(x => x.Id),
+    EffectiveLeaseTiming.AckDeadlineSeconds,
+    _handlerCts.Token);
+```
+
+https://github.com/googleapis/google-cloud-dotnet/blob/76d4c27ae2cfece6774bdebfaf2f944b9c2847e7/apis/Google.Cloud.PubSub.V1/Google.Cloud.PubSub.V1/SubscriberClientImpl.SingleChannel.cs#L808-L813
+
+`SubscriberClient.DefaultAckDeadline`の既定値は60秒です。
+起動時に出してみても`00:01:00`でした。
+サブスクリプションに設定した10秒とは別に、このSDKが使うack期限があります。
+今回の約69秒には、この期限と再試行の待ち時間が影響したと考えています。
+
+https://docs.cloud.google.com/dotnet/docs/reference/Google.Cloud.PubSub.V1/latest/Google.Cloud.PubSub.V1.SubscriberClient#Google_Cloud_PubSub_V1_SubscriberClient_DefaultAckDeadline
+
+自動延長が続く時間の上限は、`MaxTotalAckExtension`で設定できます。
+ハンドラから戻らないまま3分待つ検証では、再送されませんでした。
+
+https://docs.cloud.google.com/dotnet/docs/reference/Google.Cloud.PubSub.V1/latest/Google.Cloud.PubSub.V1.SubscriberClient.Settings#Google_Cloud_PubSub_V1_SubscriberClient_Settings_MaxTotalAckExtension
 
 ライブラリのack期限を20秒にして落とすと約31秒、120秒にすると約133秒で再送されました。
+どちらも、設定した期限より十数秒後に再送されています。
 
-# 逃がす前と後で比べる
-同じ3秒の重い処理を、APIの中でやる場合とPub/Subに逃がす場合で比べてみます。
-注文を5件、順番に投げて、APIの応答時間と全部`done`になるまでの時間を見ます。
-全部終わるまでの時間は、DBの`created_at`の最小から`done_at`の最大までで見ています。
+# ワーカーに分ける利点
+重い処理を別サーバーのワーカーに任せることで、APIサーバーのCPUやメモリの負荷を軽減できます。
 
-| | APIの応答（5件合計） | 全部終わるまで | nack |
-| --- | --- | --- | --- |
-| APIの中で処理 | 15.06秒 | 15.11秒 | - |
-| Pub/Sub・見直しなし | 0.86 / 0.85 / 0.53秒 | 18.57 / 30.13 / 19.39秒 | 0 / 5 / 2回 |
-| Pub/Sub・見直しあり | 0.81 / 0.75 / 0.52秒 | 18.51 / 18.88 / 18.80秒 | 0 / 0 / 0回 |
+同じサブスクリプションに複数のワーカーを接続すれば、メッセージを分担して処理できます。
+処理量が増えたときに、ワーカー側のサーバーを増やす構成にできます。
 
-Pub/Subのほうは3回ずつ回しています。（同期は1回だけ）
+https://docs.cloud.google.com/pubsub/docs/pubsub-basics?hl=ja
 
-APIの応答は15秒から1秒以下になりました。
+APIは受付結果を先に返せるので、呼び出し元も重い処理の完了まで待たずに済みます。
 
-ですが全部終わるまでの時間は短くなっていなくて、むしろ3〜4秒延びています。
-受け手のログを見ると、ackしてから次を受け取るまで0.2〜1.2秒くらい空いていました。
-同時に処理する数を1にしているので、その分がそのまま積み上がっています。
-
-見直しなしの30秒の回は、5件ともnackして10秒くらい待たされていました。
-1件目がnackですぐ手が空いて、2件目以降もコミット前に取りに行っていたっぽい。
-
-
-# 逃がしていい処理
-処理の重さは変わらず、APIが待たなくなるだけです。
-結果をレスポンスで返したい処理は逃がしても待つことになるので、逃がすのは待たなくていい処理とやり直せる処理だけです。
+![sync-async.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/855584/32511c68-e4f6-4e56-8fdd-03b4ff237025.png)
 
 # お値段とお片付け
-Pub/Subはpublishと受け取りのバイト数で課金されます。
+Pub/Subの送受信量の料金は、publishと受け取りのバイト数で決まります。
 
-請求先アカウントごとに月10GiBまでは無料で、1リクエストあたり最低1KBで数えられます。
+今回のpull構成では、送受信量の合計が請求先アカウントごとに月10GiBまでは無料で、1リクエストあたり最低1KBで数えられます。
+ほかに、メッセージの保存や通信経路に応じたデータ転送料金もあります。
 
 https://cloud.google.com/pubsub/pricing?hl=ja
 
@@ -347,8 +356,7 @@ Deleted topic [projects/<PROJECT>/topics/pubsub-lab-orders].
 ```
 
 # まとめ
-Pub/Subに逃がすのは簡単でも、2回届くことと、コミット前に届くことは受け手で受け止めないといけないという記事でした。
-見直しの200msは勘で決めたので、もうちょっとまともな決め方がありそうです。
+publishのタイミングや再送時の処理は考えておく必要がありますが、重い処理をワーカーに分けられる便利なサービスなのでガンガン使っていきたいですね。
 
 # 参考
 https://docs.cloud.google.com/pubsub/docs/subscription-properties?hl=ja

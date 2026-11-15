@@ -26,6 +26,6 @@ dotnet run -- api      # 別ターミナル
 | `WORKER_MODE` | `normal` | worker | `normal` / `naive` / `nack` / `hang` |
 | `WORKER_CONCURRENCY` | `1` | worker | 同時処理数（`MaxOutstandingElementCount`） |
 | `CRASH_BEFORE_ACK` | `0` | worker | `1`でUPDATE後、ack前に落ちる |
-| `RECHECK_MS` | `0` | worker | 0超なら行なし時にこの時間待って1回だけ再SELECT(normalのみ) |
+| `RECHECK_MS` | `200` | worker | 0超なら行なし時にこの時間待って1回だけ再SELECT(normalのみ) |
 | `ACK_IF_MISSING` | `0` | worker | `1`で行なし時にnackせずack(取りこぼしの再現用、normalのみ) |
 | `ACK_DEADLINE_SEC` | 未設定(ライブラリ既定) | worker | `SubscriberClient.Settings.AckDeadline`(秒) |

@@ -24,7 +24,7 @@ async Task RunApi()
     var failCommit = Env("FAIL_COMMIT", "0") == "1";
     var crashAfterCommit = Env("CRASH_AFTER_COMMIT", "0") == "1";
 
-    // 1回だけ作る: リクエストごとに作るとストリームの確立が毎回走る
+    // リクエスト間でPublisherClientを再利用する
     var publisher = await new PublisherClientBuilder
     {
         TopicName = TopicName.FromProjectTopic(project, Env("TOPIC", "pubsub-lab-orders")),
@@ -99,7 +99,7 @@ async Task RunWorker()
     var mode = Env("WORKER_MODE", "normal");
     var concurrency = long.Parse(Env("WORKER_CONCURRENCY", "1"));
     var crashBeforeAck = Env("CRASH_BEFORE_ACK", "0") == "1";
-    var recheckMs = int.Parse(Env("RECHECK_MS", "0"));
+    var recheckMs = int.Parse(Env("RECHECK_MS", "200"));
     var ackIfMissing = Env("ACK_IF_MISSING", "0") == "1";
     var ackDeadlineSec = Environment.GetEnvironmentVariable("ACK_DEADLINE_SEC");
     var ackDeadline = ackDeadlineSec is null ? (TimeSpan?)null : TimeSpan.FromSeconds(int.Parse(ackDeadlineSec));
