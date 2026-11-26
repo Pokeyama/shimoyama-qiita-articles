@@ -3,6 +3,8 @@
 | ファイル | 内容 | 挿入位置 |
 | --- | --- | --- |
 | `advent-calendar.png` | アドカレのカレンダー（本人のスクショ） | はじめに |
+| `bar.jpg` | 社内のバー（本人撮影）。1600pxに縮小してEXIFを削除 | 社内にバーがあります |
+| `bingo.png` | 社内ポータルのビンゴのモニター画面（anet-portalの検証用スクショ`.vo-handoff/party/debug/shots2/6-bingo-HOST-ranking.png`）。司会とBINGOした人の名前をffmpegでモザイク | 雰囲気（忘年会のビンゴ） |
 | `vtuber-stage.png` | 社内MTGで使っている3Dステージ（本人のスクショ） | 社内MTGはVTuberで出ています |
 | `rookie-list.png` | 新人研修の課題の一覧画面。顧客の列を塗りつぶして右と下の余白を切った | 入社してから |
 | `tech-stack.png` | 言語・インフラ・コンテナ・DBのロゴ図。編集元は`tech-stack.drawio` | 仕事 |
